@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="2dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/capa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/sem_capa"
+        android:adjustViewBounds="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:background="#A0000000"
+        app:layout_constraintStart_toStartOf="@id/capa"
+        app:layout_constraintEnd_toEndOf="@id/capa"
+        app:layout_constraintBottom_toBottomOf="@id/capa">
+
+        <TextView
+            android:id="@+id/titleAlbum"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="4dp"
+            android:text="Avril Lavigne - Girlfriend"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/qntMusicsId"/>
+        <TextView
+            android:id="@+id/qntMusicsId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12"
+            android:textSize="12sp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toStartOf="@id/noteMusical"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        <ImageView
+            android:id="@+id/noteMusical"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:paddingVertical="4dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_baseline_music_note_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/qntMusicsId"
+            app:layout_constraintTop_toTopOf="@id/qntMusicsId"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

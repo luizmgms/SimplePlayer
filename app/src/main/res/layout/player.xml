@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutPlayerId"
+    android:background="@color/colorPrimary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNextId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/black"
+        android:contentDescription="@string/next"
+        android:src="@drawable/ic_next"
+        app:borderWidth="0dp"
+        app:fabCustomSize="50dp"
+        android:layout_marginStart="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/fabPlayId"
+        app:layout_constraintStart_toEndOf="@id/fabPlayId"
+        app:layout_constraintTop_toTopOf="@id/fabPlayId" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPlayId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/black"
+        android:contentDescription="@string/play_pause"
+        android:src="@drawable/ic_play"
+        app:borderWidth="0dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nameMusicIsPlayingId" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPreviousId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/black"
+        android:contentDescription="@string/previous"
+        android:src="@drawable/ic_previous"
+        app:borderWidth="0dp"
+        app:fabCustomSize="50dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/fabPlayId"
+        app:layout_constraintEnd_toStartOf="@id/fabPlayId"
+        app:layout_constraintTop_toTopOf="@id/fabPlayId" />
+
+    <TextView
+        android:id="@+id/nameMusicIsPlayingId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginHorizontal="8dp"
+        android:gravity="center_horizontal"
+        android:textColor="@color/white"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:fadingEdge="horizontal"
+        android:fadingEdgeLength="5dp"
+        android:focusable="false"
+        android:marqueeRepeatLimit="marquee_forever"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:drawableStartCompat="@drawable/ic_musical_note_white" />
+
+    <TextView
+        android:id="@+id/currentTimeId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/time"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="@id/progressBar" />
+
+    <TextView
+        android:id="@+id/durationTimeId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/time"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
+        app:layout_constraintEnd_toEndOf="@id/progressBar" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progressTint="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fabPlayId" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

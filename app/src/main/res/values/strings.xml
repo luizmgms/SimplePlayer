@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">SimplePlayer</string>
+    <string name="bottom_expand">Expandir Player</string>
+    <string name="next">Próxima</string>
+    <string name="play_pause">Play Pause</string>
+    <string name="previous">Anterior</string>
+    <string name="name_of_music">00 Nome da Música Tocando</string>
+    <string name="musical_note">Nota Musical</string>
+    <string name="list_empty">Lista Vazia. Escolha ao menos uma música!</string>
+    <string name="title_activity_splash">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_of_album">Título do Álbum - 1999 - Ao Vivo - MTV</string>
+    <string name="qnt_of_músicas">00 Músicas</string>
+    <string name="capa_album">Capa do Álbum</string>
+    <string name="choose_dir">Escolher Pasta</string>
+    <string name="name">00 Nome da Música</string>
+    <string name="add_playlist">Adicionar a PlayList</string>
+    <string name="add_all">Adicionar Todas a PlayList</string>
+    <string name="play_all">Tocar Todas</string>
+    <string name="my_playList">Minha PlayList</string>
+    <string name="clear_all">Limpar Todas</string>
+    <string name="time">00:00</string>
+    <string name="add_to_list">Adicionada a PlayList</string>
+    <string name="playing">Tocando...</string>
+    <string name="added_all_to_playlist">Todas Adiconadas a PlayList</string>
+    <string name="drag_player">Expandir ou Ocultar</string>
+    <string name="play">Play</string>
+    <string name="oculte_player">Ocultar Player</string>
+</resources>

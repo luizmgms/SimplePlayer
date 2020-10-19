@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#292929</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="backgroundColorMain">#393939</color>
+    <color name="backgroundColorBottomSheet">#393939</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="backgrounColorSplash">#393939</color>
+</resources>
