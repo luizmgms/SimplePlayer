@@ -29,4 +29,5 @@
     <string name="drag_player">Expandir ou Ocultar</string>
     <string name="play">Play</string>
     <string name="oculte_player">Ocultar Player</string>
+    <string name="no_cape">Sem Capa</string>
 </resources>

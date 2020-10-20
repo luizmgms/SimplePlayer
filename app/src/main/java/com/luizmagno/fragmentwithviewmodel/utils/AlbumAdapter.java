@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -19,7 +20,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.ui.main.AlbumFragment;
 
+import java.io.File;
 import java.util.ArrayList;
+
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumViewHolder> {
 
@@ -31,7 +37,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
     public static class ItemAlbumViewHolder extends RecyclerView.ViewHolder {
 
         TextView titleAlbum, qntdMusics;
-        ImageView capaAlbum;
+        ImageView capaAlbum, buttonPlayAlbum;
 
         public ItemAlbumViewHolder(View view) {
             super(view);
@@ -39,6 +45,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
             titleAlbum = view.findViewById(R.id.titleAlbum);
             capaAlbum = view.findViewById(R.id.capa);
             qntdMusics = view.findViewById(R.id.qntMusicsId);
+            buttonPlayAlbum = view.findViewById(R.id.buttomPlayAlbumId);
 
 
         }
@@ -54,7 +61,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
     public ItemAlbumViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_list, parent, false);
+                .inflate(R.layout.item_list_album, parent, false);
 
         return new ItemAlbumViewHolder(itemView);
     }
@@ -101,11 +108,45 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
 
         String qnt = album.getNumOfMusics()+" Músicas";
         holder.qntdMusics.setText(qnt);
+
+        holder.buttonPlayAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArrayList<Music> musics =  getListMusicsOfAlgum(album.getPathAlbum());
+                currentSongIndex = playList.size();
+                playList.addAll(musics);
+                playSong(currentSongIndex);
+                Toast.makeText(activity, R.string.playing, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return listAlbuns.size();
+    }
+
+    private ArrayList<Music> getListMusicsOfAlgum(String path) {
+        ArrayList<Music> list = new ArrayList<>();
+
+        File pastaAlbum = new File(path);
+        File[] listaMusicas = pastaAlbum.listFiles();
+
+        if (listaMusicas != null && listaMusicas.length != 0) {
+            //Percorre a lista e verifica se algum é música
+            for (File music : listaMusicas) {
+                String name = music.getName();
+                if (name.endsWith(".mp3")) {
+                    Music m = new Music();
+                    m.setNameMusic(music.getName());
+                    m.setAbsolutePathMusic(music.getAbsolutePath());
+                    list.add(m);
+                }
+            }
+
+        }
+
+        return list;
     }
 
 }

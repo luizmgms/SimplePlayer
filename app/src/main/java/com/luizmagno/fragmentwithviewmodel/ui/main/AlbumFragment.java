@@ -1,5 +1,6 @@
 package com.luizmagno.fragmentwithviewmodel.ui.main;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -82,6 +83,17 @@ public class AlbumFragment extends Fragment {
             capa.setImageURI(Uri.parse(pathCapa));
         }
 
+        capa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(pathCapa.equals("")) {
+                    Toast.makeText(getActivity(), R.string.no_cape, Toast.LENGTH_SHORT).show();
+                } else {
+                    openImage(pathCapa);
+                }
+            }
+        });
+
         titleAlbum.setText(nameAlbum);
         String qnt = quantMusics + " Músicas";
         qntMusicsAlbum.setText(qnt);
@@ -146,6 +158,13 @@ public class AlbumFragment extends Fragment {
                 loadingDurations.setVisibility(View.INVISIBLE);
             }
         }, 0);
+    }
+
+    public void openImage(String imagePath) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(imagePath), "image/*");
+        startActivity(intent);
     }
 
     private void fillListMusics() {
