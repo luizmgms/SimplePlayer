@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/sem_capa"
         android:adjustViewBounds="true"
+        android:transitionName="transform"
         android:contentDescription="@string/capa_album"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

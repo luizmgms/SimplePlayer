@@ -4,12 +4,10 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,11 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.R;
+import com.luizmagno.fragmentwithviewmodel.utils.AsyncGetDurations;
 import com.luizmagno.fragmentwithviewmodel.utils.Music;
 import com.luizmagno.fragmentwithviewmodel.utils.MusicAdapter;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
@@ -43,7 +41,7 @@ public class AlbumFragment extends Fragment {
     private ArrayList<Music> listMusics;
     private MusicAdapter musicAdapter;
     private ImageView btnAddAll, btnPlayAll;
-    private ProgressBar loadingDurations;
+    //private ProgressBar loadingDurations;
 
     public AlbumFragment() {
         // Required empty public constructor
@@ -77,7 +75,7 @@ public class AlbumFragment extends Fragment {
         titleAlbum = fragment.findViewById(R.id.titleAlbumId);
         qntMusicsAlbum = fragment.findViewById(R.id.qntMusicsAlbumId);
         listViewMusics = fragment.findViewById(R.id.listMusicsAlbumsId);
-        loadingDurations = fragment.findViewById(R.id.loadingDurationsId);
+        //loadingDurations = fragment.findViewById(R.id.loadingDurationsId);
 
         if(!pathCapa.equals("")) {
             capa.setImageURI(Uri.parse(pathCapa));
@@ -135,7 +133,6 @@ public class AlbumFragment extends Fragment {
             }
         });
 
-
         return fragment;
     }
 
@@ -143,21 +140,9 @@ public class AlbumFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                for (Music music: listMusics) {
-                    music.setDurationMusic(loadDuration(music.getAbsolutePathMusic(), mediaPlayer));
-                }
-                mediaPlayer.release();
+        AsyncGetDurations asyncGetDurations = new AsyncGetDurations(listMusics, musicAdapter);
+        asyncGetDurations.execute(new Object());
 
-                musicAdapter.notifyDataSetChanged();
-
-                loadingDurations.setVisibility(View.INVISIBLE);
-            }
-        }, 0);
     }
 
     public void openImage(String imagePath) {
@@ -182,7 +167,6 @@ public class AlbumFragment extends Fragment {
                     Music m = new Music();
                     m.setNameMusic(music.getName());
                     m.setAbsolutePathMusic(music.getAbsolutePath());
-                    //m.setDurationMusic(loadDuration(music.getAbsolutePath(), mediaPlayer));
                     listMusics.add(m);
                 }
             }
@@ -192,19 +176,4 @@ public class AlbumFragment extends Fragment {
         mediaPlayer.release();
     }
 
-    private long loadDuration(String path, MediaPlayer mediaPlayer) {
-
-        long duration = 0;
-
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(path);
-            mediaPlayer.prepare();
-            duration = mediaPlayer.getDuration();
-        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
-            e.printStackTrace();
-        }
-
-        return duration;
-    }
 }

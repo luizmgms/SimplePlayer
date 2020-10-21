@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.transition.Slide;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
@@ -86,8 +88,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Fragment
+        Fragment fragment = MainFragment.newInstance();
+        fragment.setExitTransition(new Slide());
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, MainFragment.newInstance())
+                .replace(R.id.container, fragment)
                 .commit();
 
         //Botão para expandir ou collapse BottomSheet
@@ -610,5 +614,6 @@ public class MainActivity extends AppCompatActivity {
         if (mp != null) {
             mp.release();
         }
+        mHandler.removeCallbacks(mUpdateTimeTask);
     }
 }

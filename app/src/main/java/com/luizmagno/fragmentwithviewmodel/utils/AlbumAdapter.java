@@ -3,6 +3,14 @@ package com.luizmagno.fragmentwithviewmodel.utils;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.transition.ChangeBounds;
+import android.transition.ChangeClipBounds;
+import android.transition.ChangeImageTransform;
+import android.transition.ChangeTransform;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.R;
@@ -67,17 +76,16 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ItemAlbumViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ItemAlbumViewHolder holder, final int position) {
 
         final Album album = listAlbuns.get(position);
+
         holder.titleAlbum.setText(album.getNameAlbum());
         if (album.getPathCapaAlbum().equals("")){
             holder.capaAlbum.setImageResource(R.drawable.sem_capa);
         } else {
             holder.capaAlbum.setImageURI(Uri.parse(album.getPathCapaAlbum()));
         }
-
-        ViewCompat.setTransitionName(holder.capaAlbum, "transform");
 
         //toolbar
         toolbar = activity.findViewById(R.id.toolbar);
@@ -94,13 +102,19 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
                 bundle.putString("capaAlbum", album.getPathCapaAlbum());
                 bundle.putInt("qntMusics", album.getNumOfMusics());
 
+                //Set Arguments
                 fragment.setArguments(bundle);
+
+                //Set Transitions
+                fragment.setExitTransition(new Explode());
+                fragment.setEnterTransition(new Explode());
 
                 ((FragmentActivity)view.getContext()).getSupportFragmentManager()
                         .beginTransaction()
-                        .addSharedElement(holder.capaAlbum, "transform")
                         .replace(R.id.container, fragment).addToBackStack("album")
+                        //.setReorderingAllowed(true)
                         .commit();
+
                 toolbar.setTitle(album.getNameAlbum());
 
             }
@@ -148,5 +162,4 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
 
         return list;
     }
-
 }
