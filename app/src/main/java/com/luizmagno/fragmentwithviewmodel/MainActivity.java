@@ -45,7 +45,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
+    public static Toolbar toolbar;
     private ImageView buttonExpandBottomSheet, buttonClosePlayer;
     private LinearLayout layoutBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;

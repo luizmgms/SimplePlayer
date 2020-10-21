@@ -30,17 +30,12 @@ import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
 
 public class AlbumFragment extends Fragment {
 
-    private View fragment;
     private String pathAlbum;
     private String nameAlbum;
     private String pathCapa;
     private int quantMusics;
-    private ImageView capa;
-    private TextView titleAlbum, qntMusicsAlbum;
-    private RecyclerView listViewMusics;
     private ArrayList<Music> listMusics;
     private MusicAdapter musicAdapter;
-    private ImageView btnAddAll, btnPlayAll;
     //private ProgressBar loadingDurations;
 
     public AlbumFragment() {
@@ -61,7 +56,7 @@ public class AlbumFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        fragment = inflater.inflate(R.layout.album_fragment, container, false);
+        View fragment = inflater.inflate(R.layout.album_fragment, container, false);
         Bundle bundle = getArguments();
 
         if (bundle != null) {
@@ -71,10 +66,10 @@ public class AlbumFragment extends Fragment {
             quantMusics = bundle.getInt("qntMusics");
         }
 
-        capa = fragment.findViewById(R.id.capaAlbumId);
-        titleAlbum = fragment.findViewById(R.id.titleAlbumId);
-        qntMusicsAlbum = fragment.findViewById(R.id.qntMusicsAlbumId);
-        listViewMusics = fragment.findViewById(R.id.listMusicsAlbumsId);
+        ImageView capa = fragment.findViewById(R.id.capaAlbumId);
+        TextView titleAlbum = fragment.findViewById(R.id.titleAlbumId);
+        TextView qntMusicsAlbum = fragment.findViewById(R.id.qntMusicsAlbumId);
+        RecyclerView listViewMusics = fragment.findViewById(R.id.listMusicsAlbumsId);
         //loadingDurations = fragment.findViewById(R.id.loadingDurationsId);
 
         if(!pathCapa.equals("")) {
@@ -110,7 +105,7 @@ public class AlbumFragment extends Fragment {
         listViewMusics.setHasFixedSize(true);
 
         //Botão AddAll
-        btnAddAll = fragment.findViewById(R.id.icAddAllId);
+        ImageView btnAddAll = fragment.findViewById(R.id.icAddAllId);
         btnAddAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -122,7 +117,7 @@ public class AlbumFragment extends Fragment {
         });
 
         //Botão PlayAll
-        btnPlayAll = fragment.findViewById(R.id.icPlayAllId);
+        ImageView btnPlayAll = fragment.findViewById(R.id.icPlayAllId);
         btnPlayAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

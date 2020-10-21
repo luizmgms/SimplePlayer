@@ -1,8 +1,10 @@
 package com.luizmagno.fragmentwithviewmodel.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.transition.ChangeBounds;
 import android.transition.ChangeClipBounds;
 import android.transition.ChangeImageTransform;
@@ -28,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.ui.main.AlbumFragment;
+import com.luizmagno.fragmentwithviewmodel.ui.main.ViewPagerAlbumFragment;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -94,25 +97,28 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
             @Override
             public void onClick(View view) {
 
-                Fragment fragment = AlbumFragment.newInstance();
+                //Fragment fragment = AlbumFragment.newInstance();
+                Fragment fragment = ViewPagerAlbumFragment.newInstance();
                 Bundle bundle = new Bundle();
 
-                bundle.putString("pathAlbum", album.getPathAlbum());
+                String pathAlbuns = activity.getSharedPreferences(
+                        "com.luizmagno.music.preferences", Context.MODE_PRIVATE)
+                        .getString("directoryMusic","noExists");
+
+                bundle.putString("directoryMusic", pathAlbuns);
+                bundle.putInt("position", position);
+
+                /*bundle.putString("pathAlbum", album.getPathAlbum());
                 bundle.putString("titleAlbum", album.getNameAlbum());
                 bundle.putString("capaAlbum", album.getPathCapaAlbum());
-                bundle.putInt("qntMusics", album.getNumOfMusics());
+                bundle.putInt("qntMusics", album.getNumOfMusics());*/
 
                 //Set Arguments
                 fragment.setArguments(bundle);
 
-                //Set Transitions
-                fragment.setExitTransition(new Explode());
-                fragment.setEnterTransition(new Explode());
-
                 ((FragmentActivity)view.getContext()).getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.container, fragment).addToBackStack("album")
-                        //.setReorderingAllowed(true)
                         .commit();
 
                 toolbar.setTitle(album.getNameAlbum());
