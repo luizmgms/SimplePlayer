@@ -24,6 +24,8 @@ import com.codekidlabs.storagechooser.StorageChooser;
 import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
 
+import java.util.Objects;
+
 public class InitFragment extends Fragment {
 
     View fragment;
@@ -31,7 +33,7 @@ public class InitFragment extends Fragment {
     private static final int PERMISSION_REQUEST_READ_CARD = 0;
     private SharedPreferences sharedPreferences;
     private SwitchCompat switchCompat;
-    private TextView textOk, tudoOk;
+    private TextView textOk;
     private Button buttonChoose;
     private String pathDirectory;
 
@@ -56,13 +58,16 @@ public class InitFragment extends Fragment {
         fragment = inflater.inflate(R.layout.init_fragment, container, false);
 
         //Preferences
-        sharedPreferences = getActivity().getSharedPreferences("com.luizmagno.music.preferences", Context.MODE_PRIVATE);
+        sharedPreferences = Objects.requireNonNull(
+                getActivity()).getSharedPreferences(
+                        "com.luizmagno.music.preferences", Context.MODE_PRIVATE);
+
         pathDirectory = sharedPreferences.getString("directoryMusic", "noExists");
 
         switchCompat = fragment.findViewById(R.id.switchReadId);
         textOk =  fragment.findViewById(R.id.okId);
         buttonChoose =  fragment.findViewById(R.id.buttonChooseId);
-        tudoOk =  fragment.findViewById(R.id.buttonTudoOkId);
+        TextView tudoOk = fragment.findViewById(R.id.buttonTudoOkId);
 
         if (checkPermission()) {
             textOk.setVisibility(View.VISIBLE);
@@ -120,14 +125,15 @@ public class InitFragment extends Fragment {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         intent.putExtra("directoryMusic", pathDirectory);
         startActivity(intent);
-        getActivity().finish();
+        Objects.requireNonNull(getActivity()).finish();
     }
 
     private boolean checkPermission() {
 
         // Check if the read permission has been granted
         // Permission is already available
-        return ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+        return ActivityCompat.checkSelfPermission(
+                Objects.requireNonNull(getContext()), Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
     }
 
@@ -136,7 +142,7 @@ public class InitFragment extends Fragment {
         final StorageChooser chooser = new StorageChooser.Builder()
                 // Specify context of the dialog
                 .withActivity(getActivity())
-                .withFragmentManager(getActivity().getFragmentManager())
+                .withFragmentManager(Objects.requireNonNull(getActivity()).getFragmentManager())
                 .withMemoryBar(true)
                 .allowCustomPath(true)
                 // Define the mode as the FOLDER/DIRECTORY CHOOSER
@@ -161,7 +167,8 @@ public class InitFragment extends Fragment {
 
     private void requestReadCardPermission() {
         // Permission has not been granted and must be requested.
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                Objects.requireNonNull(getActivity()),
                 Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
             // Provide an additional rationale to the user if the permission was not granted

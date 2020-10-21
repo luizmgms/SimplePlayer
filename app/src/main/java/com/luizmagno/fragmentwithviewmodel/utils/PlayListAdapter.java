@@ -1,13 +1,12 @@
 package com.luizmagno.fragmentwithviewmodel.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
-
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.luizmagno.fragmentwithviewmodel.R;
@@ -45,7 +44,7 @@ public class PlayListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
 
-        View v = activity.getLayoutInflater()
+        @SuppressLint("ViewHolder") View v = activity.getLayoutInflater()
                 .inflate(R.layout.item_playlist, viewGroup, false);
 
         Music music = listMusics.get(i);

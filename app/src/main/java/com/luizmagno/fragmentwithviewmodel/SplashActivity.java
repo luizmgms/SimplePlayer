@@ -17,7 +17,6 @@ import com.luizmagno.fragmentwithviewmodel.ui.main.InitFragment;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private SharedPreferences sharedPreferences;
     private String pathDirectory;
 
     @Override
@@ -26,7 +25,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         //Preferences
-        sharedPreferences = getSharedPreferences("com.luizmagno.music.preferences", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("com.luizmagno.music.preferences", Context.MODE_PRIVATE);
         pathDirectory = sharedPreferences.getString("directoryMusic", "noExists");
 
         Handler handler = new Handler();

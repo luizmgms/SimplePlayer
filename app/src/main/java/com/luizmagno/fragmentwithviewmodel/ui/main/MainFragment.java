@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -17,7 +14,6 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,19 +24,14 @@ import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.SplashActivity;
 import com.luizmagno.fragmentwithviewmodel.utils.Album;
 import com.luizmagno.fragmentwithviewmodel.utils.AlbumAdapter;
+import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class MainFragment extends Fragment {
 
-    private RecyclerView mRecyclerView;
-    private AlbumAdapter adapterAlbum;
-    private View fragment;
-    private ArrayList<Album> listAlbuns;
     private SharedPreferences sharedPreferences;
 
     LinearLayout layoutBottomSheet;
@@ -57,21 +48,21 @@ public class MainFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         //Preferences
-        sharedPreferences = getActivity().getSharedPreferences(
+        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 "com.luizmagno.music.preferences", Context.MODE_PRIVATE);
 
         //Fragment e View's
-        fragment = inflater.inflate(R.layout.main_fragment, container, false);
+        View fragment = inflater.inflate(R.layout.main_fragment, container, false);
         layoutBottomSheet = Objects.requireNonNull(getActivity()).findViewById(R.id.layout_bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
-        mRecyclerView = fragment.findViewById(R.id.reclycerViewId);
+        RecyclerView mRecyclerView = fragment.findViewById(R.id.reclycerViewId);
 
         //Pegar caminho do diretório de Álbuns
         Bundle bundle = getActivity().getIntent().getExtras();
         assert bundle != null;
         String pathMusics = bundle.getString("directoryMusic","noExists");
 
-        listAlbuns = new ArrayList<>();
+        ArrayList<Album> listAlbuns = new ArrayList<>();
 
         //Pegar albuns e add na lista e verifica se existe algum
         if (!pathMusics.equals("noExists")) {
@@ -80,8 +71,8 @@ public class MainFragment extends Fragment {
             File[] listaAlbuns = pastaMusicas.listFiles();
 
             if (listaAlbuns != null && listaAlbuns.length != 0) {
-                for (File listaAlbun : listaAlbuns) {
-                    Album album = getAlbum(listaAlbun);
+                for (File listaAlbum : listaAlbuns) {
+                    Album album = new Utilities().getAlbum(listaAlbum);
                     listAlbuns.add(album);
                 }
             } else {
@@ -115,75 +106,15 @@ public class MainFragment extends Fragment {
         //Reclycer
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        adapterAlbum = new AlbumAdapter(listAlbuns, getActivity());
+        AlbumAdapter adapterAlbum = new AlbumAdapter(listAlbuns, getActivity());
         mRecyclerView.setAdapter(adapterAlbum);
         mRecyclerView.setHasFixedSize(true);
 
         return fragment;
     }
 
-    private Album getAlbum(File dirAlbum) {
-
-        Album album = new Album();
-
-        album.setNameAlbum(dirAlbum.getName());
-        album.setPathCapaAlbum(getPathCapa(dirAlbum.getAbsolutePath()));
-        album.setPathAlbum(dirAlbum.getAbsolutePath());
-        album.setNumOfMusics(getNumOfMusics(dirAlbum.getAbsolutePath()));
-
-        return  album;
-    }
-
-    private String getPathCapa(String pathAlbum) {
-
-        String pathCapa = "";
-        File pastaAlbum = new File(pathAlbum);
-        File[] listaMusicas = pastaAlbum.listFiles();
-
-        int temCapa = -1;
-        if (listaMusicas != null && listaMusicas.length != 0) {
-            //Percorre a lista e verifica se algum é imagem
-            for (int i = 0; i < listaMusicas.length; i++) {
-                //Se no nome conter extensão .png, .jpg ou .jpeg, set a capa.
-                if (listaMusicas[i].getName().endsWith(".png") ||
-                        listaMusicas[i].getName().endsWith(".jpeg") ||
-                        listaMusicas[i].getName().endsWith(".jpg")) {
-                    temCapa = i;
-                }
-            }
-
-        }
-
-        if (temCapa != -1){
-            pathCapa = listaMusicas[temCapa].getAbsolutePath();
-        }
-
-        return pathCapa;
-    }
-
-    private int getNumOfMusics(String pathAlbum) {
-
-        int cont = 0;
-
-        File pastaAlbum = new File(pathAlbum);
-        File[] listaMusicas = pastaAlbum.listFiles();
-
-        if (listaMusicas != null && listaMusicas.length != 0) {
-            //Percorre a lista e verifica se algum é imagem
-            for (File listaMusica : listaMusicas) {
-                //Se no nome conter extensão .mp3
-                if (listaMusica.getName().endsWith(".mp3")) {
-                    cont++;
-                }
-            }
-
-        }
-
-        return cont;
-    }
-
     private void showAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
         builder.setMessage("Escolha a pasta dos Álbuns")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -204,7 +135,7 @@ public class MainFragment extends Fragment {
         final StorageChooser chooser = new StorageChooser.Builder()
                 // Specify context of the dialog
                 .withActivity(getActivity())
-                .withFragmentManager(getActivity().getFragmentManager())
+                .withFragmentManager(Objects.requireNonNull(getActivity()).getFragmentManager())
                 .withMemoryBar(true)
                 .allowCustomPath(true)
                 // Define the mode as the FOLDER/DIRECTORY CHOOSER
@@ -228,7 +159,7 @@ public class MainFragment extends Fragment {
     private void restartApp() {
         Intent i = new Intent(getActivity(), SplashActivity.class);
         startActivity(i);
-        getActivity().finish();
+        Objects.requireNonNull(getActivity()).finish();
     }
 
     @Override

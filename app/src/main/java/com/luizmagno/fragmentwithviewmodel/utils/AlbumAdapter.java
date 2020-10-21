@@ -4,15 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.transition.ChangeBounds;
-import android.transition.ChangeClipBounds;
-import android.transition.ChangeImageTransform;
-import android.transition.ChangeTransform;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,14 +13,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.ui.main.AlbumFragment;
 import com.luizmagno.fragmentwithviewmodel.ui.main.ViewPagerAlbumFragment;
 
 import java.io.File;
@@ -126,7 +114,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
             }
         });
 
-        String qnt = album.getNumOfMusics()+" Músicas";
+        String qnt = album.getNumOfMusics()  +" Músicas";
         holder.qntdMusics.setText(qnt);
 
         holder.buttonPlayAlbum.setOnClickListener(new View.OnClickListener() {

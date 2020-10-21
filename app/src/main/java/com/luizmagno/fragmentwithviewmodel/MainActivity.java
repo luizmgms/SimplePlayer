@@ -30,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -45,28 +44,31 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    @SuppressLint("StaticFieldLeak")
     public static Toolbar toolbar;
     private ImageView buttonExpandBottomSheet, buttonClosePlayer;
     private LinearLayout layoutBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
     private ConstraintLayout layoutPlayer;
+    @SuppressLint("StaticFieldLeak")
     private static TextView nameMusicCurrent;
-    private ListView playListView;
     public static ArrayList<Music> playList;
+    @SuppressLint("StaticFieldLeak")
     public static PlayListAdapter playListAdapter;
 
     public static boolean stop = true;
     public static boolean pause = false;
     public static int currentSongIndex = 0;
+    @SuppressLint("StaticFieldLeak")
     private static ProgressBar progressBar;
     private static Handler mHandler = new Handler();
     private static Utilities utils = new Utilities();
+    @SuppressLint("StaticFieldLeak")
     private static TextView timeCurrent;
+    @SuppressLint("StaticFieldLeak")
     private static TextView timeTotal;
 
     private static FloatingActionButton buttonPlay;
-    private FloatingActionButton buttonNext;
-    private FloatingActionButton buttonPrevious;
 
     public static MediaPlayer mp = new MediaPlayer();
 
@@ -132,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         //PlayList
-        playListView = findViewById(R.id.playListId);
+        ListView playListView = findViewById(R.id.playListId);
 
         //Inicializando PlayList
         playList = new ArrayList<>();
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //botão Next
-        buttonNext = findViewById(R.id.fabNextId);
+        FloatingActionButton buttonNext = findViewById(R.id.fabNextId);
         buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -173,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //botão Previous
-        buttonPrevious = findViewById(R.id.fabPreviousId);
+        FloatingActionButton buttonPrevious = findViewById(R.id.fabPreviousId);
         buttonPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -196,26 +198,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
 
-                if (currentSongIndex == playList.size() - 1) {
-                    //Música que está tocando é a última da lista, então parar de tocar
-                    mp.stop();
-                    stop = true;
-                    pause = false;
-                    currentSongIndex = 0;
-                    buttonPlay.setImageResource(R.drawable.ic_play);
-                    mHandler.removeCallbacks(mUpdateTimeTask);
-                    progressBar.setProgress(0);
-                    timeCurrent.setText("");
-                    timeTotal.setText("");
-                    notifyPlayListAdapter();
+                if (!playList.isEmpty()) {
+                    //Se a PlayList não estiver vazia
+                    if (currentSongIndex == playList.size() - 1) {
+                        //Música que está tocando é a última da lista, então parar de tocar
+                        setStoppedAtribsUI();
+                    } else {
+                        //Não é a última então toque a próxima música
+                        mp.stop();
+                        stop = true;
+                        pause = false;
+                        currentSongIndex++;
+                        notifyPlayListAdapter();
+                        playPlayList(activity);
+                    }
+
                 } else {
-                    //Não é a última então toque a próxima música
-                    mp.stop();
-                    stop = true;
-                    pause = false;
-                    currentSongIndex++;
-                    notifyPlayListAdapter();
-                    playPlayList(activity);
+                    //Lista está vazia
+                    setStoppedAtribsUI();
                 }
 
             }
@@ -256,14 +256,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void previousMusic () {
         if (playList.isEmpty()) {
-            Toast.makeText(this,
-                    R.string.list_empty, Toast.LENGTH_SHORT).show();
-            if (mp.isPlaying()) {
-                mp.stop();
-                stop = true;
-                pause = false;
-                buttonPlay.setImageResource(R.drawable.ic_play);
-            }
+
+            Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
+
+            setStoppedAtribsUI();
+
         } else {
             if (currentSongIndex == 0) {
                 currentSongIndex = playList.size() - 1;
@@ -280,14 +277,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void nextMusic() {
         if (playList.isEmpty()) {
-            Toast.makeText(this,
-                    R.string.list_empty, Toast.LENGTH_SHORT).show();
-            if (mp.isPlaying()) {
-                mp.stop();
-                stop = true;
-                pause = false;
-                buttonPlay.setImageResource(R.drawable.ic_play);
-            }
+
+            Toast.makeText(this,  R.string.list_empty, Toast.LENGTH_SHORT).show();
+
+            setStoppedAtribsUI();
+
         } else {
             if (currentSongIndex == playList.size() - 1) {
                 currentSongIndex = 0;
@@ -302,7 +296,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ListView.OnTouchListener onTouchListener() {
-        return (new ListView.OnTouchListener() {
+        return new ListView.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
@@ -324,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
             }
-        });
+        };
     }
 
     @Override
@@ -352,16 +347,11 @@ public class MainActivity extends AppCompatActivity {
     public static void playPlayList(Activity activity) {
         if (playList.isEmpty()) {
             if (mp.isPlaying()) {
-                mp.stop();
-                stop = true;
-                pause = false;
-                currentSongIndex = 0;
-                buttonPlay.setImageResource(R.drawable.ic_play);
-                notifyPlayListAdapter();
+                playPauseSong();
+            } else if(pause){
+                playPauseSong();
             } else {
-                Toast.makeText(activity,
-                        R.string.list_empty,
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, R.string.list_empty, Toast.LENGTH_SHORT).show();
             }
         } else if(stop) {
             playSong(currentSongIndex);
@@ -484,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private int convertDpToPx(int dp) {
+    /*private int convertDpToPx(int dp) {
         DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         float density = displayMetrics.density;
         return (int) ((dp*density) + 0.5);
@@ -494,10 +484,10 @@ public class MainActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         float density = displayMetrics.density;
         return (int) ((px/density) + 0.5);
-    }
+    }*/
 
 
-    private RecyclerView.OnScrollListener scrollPlayListListener() {
+    /*private RecyclerView.OnScrollListener scrollPlayListListener() {
         return (new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -515,7 +505,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
+    }*/
 
     private View.OnClickListener listenerButtonExpand () {
         return (new View.OnClickListener() {
@@ -616,4 +606,19 @@ public class MainActivity extends AppCompatActivity {
         }
         mHandler.removeCallbacks(mUpdateTimeTask);
     }
+
+    private void setStoppedAtribsUI () {
+        mp.stop();
+        stop = true;
+        pause = false;
+        currentSongIndex = 0;
+        nameMusicCurrent.setText("");
+        buttonPlay.setImageResource(R.drawable.ic_play);
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        progressBar.setProgress(0);
+        timeCurrent.setText(R.string.time);
+        timeTotal.setText(R.string.time);
+        notifyPlayListAdapter();
+    }
+
 }

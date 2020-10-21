@@ -1,7 +1,5 @@
 package com.luizmagno.fragmentwithviewmodel.ui.main;
 
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,19 +7,19 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.utils.Album;
 import com.luizmagno.fragmentwithviewmodel.utils.PagerViewAlbumAdapter;
+import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 import com.luizmagno.fragmentwithviewmodel.utils.ZoomOutPageTransformer;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.toolbar;
 
@@ -45,6 +43,7 @@ public class ViewPagerAlbumFragment extends Fragment {
 
         View fragment = inflater.inflate(R.layout.view_pager_album_fragment,container, false);
 
+        assert getArguments() != null;
         String pathAlbuns = getArguments().getString("directoryMusic");
         final int position = getArguments().getInt("position");
 
@@ -53,7 +52,7 @@ public class ViewPagerAlbumFragment extends Fragment {
         ViewPager viewPager = fragment.findViewById(R.id.viewPagerAlbumId);
 
         PagerAdapter pagerAdapter = new PagerViewAlbumAdapter(
-                getActivity().getSupportFragmentManager(), listAlbuns);
+                Objects.requireNonNull(getActivity()).getSupportFragmentManager(), listAlbuns);
 
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(position);
@@ -88,72 +87,12 @@ public class ViewPagerAlbumFragment extends Fragment {
 
         if (listaAlbuns != null && listaAlbuns.length != 0) {
             for (File listaAlbum : listaAlbuns) {
-                Album album = getAlbum(listaAlbum);
+                Album album = new Utilities().getAlbum(listaAlbum);
                 list.add(album);
             }
         }
 
         return list;
-    }
-
-    private Album getAlbum(File dirAlbum) {
-
-        Album album = new Album();
-
-        album.setNameAlbum(dirAlbum.getName());
-        album.setPathCapaAlbum(getPathCapa(dirAlbum.getAbsolutePath()));
-        album.setPathAlbum(dirAlbum.getAbsolutePath());
-        album.setNumOfMusics(getNumOfMusics(dirAlbum.getAbsolutePath()));
-
-        return  album;
-    }
-
-    private String getPathCapa(String pathAlbum) {
-
-        String pathCapa = "";
-        File pastaAlbum = new File(pathAlbum);
-        File[] listaMusicas = pastaAlbum.listFiles();
-
-        int temCapa = -1;
-        if (listaMusicas != null && listaMusicas.length != 0) {
-            //Percorre a lista e verifica se algum é imagem
-            for (int i = 0; i < listaMusicas.length; i++) {
-                //Se no nome conter extensão .png, .jpg ou .jpeg, set a capa.
-                if (listaMusicas[i].getName().endsWith(".png") ||
-                        listaMusicas[i].getName().endsWith(".jpeg") ||
-                        listaMusicas[i].getName().endsWith(".jpg")) {
-                    temCapa = i;
-                }
-            }
-
-        }
-
-        if (temCapa != -1){
-            pathCapa = listaMusicas[temCapa].getAbsolutePath();
-        }
-
-        return pathCapa;
-    }
-
-    private int getNumOfMusics(String pathAlbum) {
-
-        int cont = 0;
-
-        File pastaAlbum = new File(pathAlbum);
-        File[] listaMusicas = pastaAlbum.listFiles();
-
-        if (listaMusicas != null && listaMusicas.length != 0) {
-            //Percorre a lista e verifica se algum é imagem
-            for (File listaMusica : listaMusicas) {
-                //Se no nome conter extensão .mp3
-                if (listaMusica.getName().endsWith(".mp3")) {
-                    cont++;
-                }
-            }
-
-        }
-
-        return cont;
     }
 
 }
