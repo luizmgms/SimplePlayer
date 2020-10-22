@@ -11,6 +11,11 @@ import com.luizmagno.fragmentwithviewmodel.ui.main.AlbumFragment;
 
 import java.util.ArrayList;
 
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.CAPA_ALBUM;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.PATH_ALBUM;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.QNT_MUSICS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.TITLE_ALBUM;
+
 public class PagerViewAlbumAdapter extends FragmentStatePagerAdapter {
 
     private ArrayList<Album> listAlbuns;
@@ -28,10 +33,10 @@ public class PagerViewAlbumAdapter extends FragmentStatePagerAdapter {
         Fragment fragment = AlbumFragment.newInstance();
         Bundle bundle = new Bundle();
 
-        bundle.putString("pathAlbum", album.getPathAlbum());
-        bundle.putString("titleAlbum", album.getNameAlbum());
-        bundle.putString("capaAlbum", album.getPathCapaAlbum());
-        bundle.putInt("qntMusics", album.getNumOfMusics());
+        bundle.putString(PATH_ALBUM, album.getPathAlbum());
+        bundle.putString(TITLE_ALBUM, album.getNameAlbum());
+        bundle.putString(CAPA_ALBUM, album.getPathCapaAlbum());
+        bundle.putInt(QNT_MUSICS, album.getNumOfMusics());
 
         //Set Arguments
         fragment.setArguments(bundle);

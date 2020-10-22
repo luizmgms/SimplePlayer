@@ -14,14 +14,15 @@ import androidx.viewpager.widget.ViewPager;
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.utils.Album;
 import com.luizmagno.fragmentwithviewmodel.utils.PagerViewAlbumAdapter;
-import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 import com.luizmagno.fragmentwithviewmodel.utils.ZoomOutPageTransformer;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.toolbar;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.POSITION;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getListAlbuns;
 
 public class ViewPagerAlbumFragment extends Fragment {
 
@@ -44,8 +45,8 @@ public class ViewPagerAlbumFragment extends Fragment {
         View fragment = inflater.inflate(R.layout.view_pager_album_fragment,container, false);
 
         assert getArguments() != null;
-        String pathAlbuns = getArguments().getString("directoryMusic");
-        final int position = getArguments().getInt("position");
+        String pathAlbuns = getArguments().getString(DIRECTORY_MUSICS);
+        final int position = getArguments().getInt(POSITION);
 
         listAlbuns = getListAlbuns(pathAlbuns);
 
@@ -57,42 +58,26 @@ public class ViewPagerAlbumFragment extends Fragment {
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(position);
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                toolbar.setTitle(listAlbuns.get(position).getNameAlbum());
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        viewPager.addOnPageChangeListener(onPageChangeListener());
 
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         return fragment;
     }
 
-    private ArrayList<Album> getListAlbuns(String path) {
-        ArrayList<Album> list = new ArrayList<>();
-
-        File pastaMusicas = new File(path);
-        File[] listaAlbuns = pastaMusicas.listFiles();
-
-        if (listaAlbuns != null && listaAlbuns.length != 0) {
-            for (File listaAlbum : listaAlbuns) {
-                Album album = new Utilities().getAlbum(listaAlbum);
-                list.add(album);
+    private ViewPager.OnPageChangeListener onPageChangeListener() {
+        return (new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                toolbar.setTitle(listAlbuns.get(position).getNameAlbum());
             }
-        }
 
-        return list;
+            @Override
+            public void onPageSelected(int position) { }
+
+            @Override
+            public void onPageScrollStateChanged(int state) { }
+        });
     }
 
 }

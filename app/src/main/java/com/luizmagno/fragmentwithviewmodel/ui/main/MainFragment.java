@@ -1,10 +1,7 @@
 package com.luizmagno.fragmentwithviewmodel.ui.main;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.SplashActivity;
 import com.luizmagno.fragmentwithviewmodel.utils.Album;
 import com.luizmagno.fragmentwithviewmodel.utils.AlbumAdapter;
 import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
@@ -30,9 +26,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class MainFragment extends Fragment {
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.NO_EXISTS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.putStringOnShared;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.startMain;
 
-    private SharedPreferences sharedPreferences;
+public class MainFragment extends Fragment {
 
     LinearLayout layoutBottomSheet;
     BottomSheetBehavior bottomSheetBehavior;
@@ -47,9 +46,6 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        //Preferences
-        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences(
-                "com.luizmagno.music.preferences", Context.MODE_PRIVATE);
 
         //Fragment e View's
         View fragment = inflater.inflate(R.layout.main_fragment, container, false);
@@ -60,12 +56,12 @@ public class MainFragment extends Fragment {
         //Pegar caminho do diretório de Álbuns
         Bundle bundle = getActivity().getIntent().getExtras();
         assert bundle != null;
-        String pathMusics = bundle.getString("directoryMusic","noExists");
+        String pathMusics = bundle.getString(DIRECTORY_MUSICS,NO_EXISTS);
 
         ArrayList<Album> listAlbuns = new ArrayList<>();
 
         //Pegar albuns e add na lista e verifica se existe algum
-        if (!pathMusics.equals("noExists")) {
+        if (!pathMusics.equals(NO_EXISTS)) {
             //Existe, add na lista
             File pastaMusicas = new File(pathMusics);
             File[] listaAlbuns = pastaMusicas.listFiles();
@@ -84,7 +80,7 @@ public class MainFragment extends Fragment {
         }
 
 
-        //Quando Scrolling
+        /*//Quando Scrolling
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -101,7 +97,7 @@ public class MainFragment extends Fragment {
                     }
                 }
             }
-        });
+        });*/
 
         //Reclycer
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -115,13 +111,13 @@ public class MainFragment extends Fragment {
 
     private void showAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
-        builder.setMessage("Escolha a pasta dos Álbuns")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.choose_dir)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         chooseDirectory();
                     }
                 })
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User cancelled the dialog
                     }
@@ -146,20 +142,14 @@ public class MainFragment extends Fragment {
         chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
             @Override
             public void onSelect(String path) {
-                // e.g /storage/emulated/0/Documents
-                sharedPreferences.edit().putString("directoryMusic", path).apply();
-                restartApp();
+
+                putStringOnShared(getActivity(), path);
+                startMain(getActivity(), path);
             }
         });
 
         // 3. Display File Picker whenever you need to !
         chooser.show();
-    }
-
-    private void restartApp() {
-        Intent i = new Intent(getActivity(), SplashActivity.class);
-        startActivity(i);
-        Objects.requireNonNull(getActivity()).finish();
     }
 
     @Override

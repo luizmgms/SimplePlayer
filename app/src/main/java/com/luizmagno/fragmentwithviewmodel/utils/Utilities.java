@@ -1,8 +1,33 @@
 package com.luizmagno.fragmentwithviewmodel.utils;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+
+import androidx.core.app.ActivityCompat;
+
+import com.luizmagno.fragmentwithviewmodel.MainActivity;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class Utilities {
+
+    public final static  String SHARED_PREFERENCES = "com.luizmagno.music.preferences";
+    public final static String DIRECTORY_MUSICS = "directoryMusic";
+    public final static String NO_EXISTS = "noExists";
+    public final static String POSITION = "position";
+    public final static String PATH_ALBUM = "pathAlbum";
+    public final static String TITLE_ALBUM = "titleAlbum";
+    public final static String CAPA_ALBUM = "capaAlbum";
+    public final static String QNT_MUSICS = "qntMusics";
+    public final static String ALBUM = "album";
+
+    public final static int PERMISSION_REQUEST_READ_CARD = 0;
 
     /**
      * Function to convert milliseconds time to
@@ -124,5 +149,101 @@ public class Utilities {
         }
 
         return cont;
+    }
+
+    public static boolean checkPermissionOfReadCard(Context context) {
+
+        // Check if the read permission has been granted
+        // Permission is already available
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static String getPathDirectoryMusicsFromShared(Activity activity) {
+
+        SharedPreferences sharedPreferences = Objects.requireNonNull(
+                activity).getSharedPreferences(
+                Utilities.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+
+        return sharedPreferences.getString(Utilities.DIRECTORY_MUSICS, NO_EXISTS);
+    }
+
+    public static void putStringOnShared(Activity activity, String string) {
+
+        SharedPreferences sharedPreferences = Objects.requireNonNull(
+                activity).getSharedPreferences(
+                SHARED_PREFERENCES, Context.MODE_PRIVATE
+        );
+
+        sharedPreferences.edit().putString(DIRECTORY_MUSICS, string).apply();
+    }
+
+    public static void requestReadCardPermission(Activity activity) {
+        // Permission has not been granted and must be requested.
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                Objects.requireNonNull(activity),
+                Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // Display a SnackBar with cda button to request the missing permission.
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_READ_CARD);
+
+        } else {
+            // Request the permission. The result will be received in onRequestPermissionResult().
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_READ_CARD);
+        }
+    }
+
+    public static void startMain(Activity activity, String extra) {
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra(DIRECTORY_MUSICS, extra);
+        activity.startActivity(intent);
+        activity.finish();
+    }
+
+    public static ArrayList<Album> getListAlbuns(String path) {
+
+        ArrayList<Album> list = new ArrayList<>();
+
+        File pastaMusicas = new File(path);
+        File[] listaAlbuns = pastaMusicas.listFiles();
+
+        if (listaAlbuns != null && listaAlbuns.length != 0) {
+            for (File listaAlbum : listaAlbuns) {
+                Album album = new Utilities().getAlbum(listaAlbum);
+                list.add(album);
+            }
+        }
+
+        return list;
+    }
+
+    public static ArrayList<Music> getListMusics(String path) {
+
+        ArrayList<Music> list = new ArrayList<>();
+
+        File pastaAlbum = new File(path);
+        File[] listaMusicas = pastaAlbum.listFiles();
+
+        if (listaMusicas != null && listaMusicas.length != 0) {
+            //Percorre a lista e verifica se algum é música
+            for (File music : listaMusicas) {
+                String name = music.getName();
+                if (name.endsWith(".mp3")) {
+                    Music m = new Music();
+                    m.setNameMusic(music.getName());
+                    m.setAbsolutePathMusic(music.getAbsolutePath());
+                    list.add(m);
+                }
+            }
+
+        }
+
+        return list;
+
     }
 }

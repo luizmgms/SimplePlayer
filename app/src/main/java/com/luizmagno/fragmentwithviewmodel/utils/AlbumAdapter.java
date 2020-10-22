@@ -26,6 +26,11 @@ import java.util.ArrayList;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.ALBUM;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.POSITION;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getListMusics;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getPathDirectoryMusicsFromShared;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumViewHolder> {
 
@@ -89,12 +94,10 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
                 Fragment fragment = ViewPagerAlbumFragment.newInstance();
                 Bundle bundle = new Bundle();
 
-                String pathAlbuns = activity.getSharedPreferences(
-                        "com.luizmagno.music.preferences", Context.MODE_PRIVATE)
-                        .getString("directoryMusic","noExists");
+                String pathAlbums = getPathDirectoryMusicsFromShared(activity);
 
-                bundle.putString("directoryMusic", pathAlbuns);
-                bundle.putInt("position", position);
+                bundle.putString(DIRECTORY_MUSICS, pathAlbums);
+                bundle.putInt(POSITION, position);
 
                 /*bundle.putString("pathAlbum", album.getPathAlbum());
                 bundle.putString("titleAlbum", album.getNameAlbum());
@@ -106,7 +109,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
 
                 ((FragmentActivity)view.getContext()).getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.container, fragment).addToBackStack("album")
+                        .replace(R.id.container, fragment).addToBackStack(ALBUM)
                         .commit();
 
                 toolbar.setTitle(album.getNameAlbum());
@@ -114,13 +117,14 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
             }
         });
 
-        String qnt = album.getNumOfMusics()  +" Músicas";
+        String qnt = album.getNumOfMusics()  +" " +
+                activity.getResources().getString(R.string.musics);
         holder.qntdMusics.setText(qnt);
 
         holder.buttonPlayAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Music> musics =  getListMusicsOfAlgum(album.getPathAlbum());
+                ArrayList<Music> musics =  getListMusics(album.getPathAlbum());
                 currentSongIndex = playList.size();
                 playList.addAll(musics);
                 playSong(currentSongIndex);
@@ -134,26 +138,4 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
         return listAlbuns.size();
     }
 
-    private ArrayList<Music> getListMusicsOfAlgum(String path) {
-        ArrayList<Music> list = new ArrayList<>();
-
-        File pastaAlbum = new File(path);
-        File[] listaMusicas = pastaAlbum.listFiles();
-
-        if (listaMusicas != null && listaMusicas.length != 0) {
-            //Percorre a lista e verifica se algum é música
-            for (File music : listaMusicas) {
-                String name = music.getName();
-                if (name.endsWith(".mp3")) {
-                    Music m = new Music();
-                    m.setNameMusic(music.getName());
-                    m.setAbsolutePathMusic(music.getAbsolutePath());
-                    list.add(m);
-                }
-            }
-
-        }
-
-        return list;
-    }
 }

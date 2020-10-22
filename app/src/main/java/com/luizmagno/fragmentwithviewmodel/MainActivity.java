@@ -42,6 +42,10 @@ import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.putStringOnShared;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.startMain;
+
 public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("StaticFieldLeak")
@@ -194,7 +198,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //OnCompletionListener
-        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        mp.setOnCompletionListener(onCompletionListener());
+
+    }
+
+    private MediaPlayer.OnCompletionListener onCompletionListener() {
+        return (new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
 
@@ -220,8 +229,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
 
     /**
@@ -258,10 +265,10 @@ public class MainActivity extends AppCompatActivity {
         if (playList.isEmpty()) {
 
             Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
-
             setStoppedAtribsUI();
 
         } else {
+
             if (currentSongIndex == 0) {
                 currentSongIndex = playList.size() - 1;
             } else {
@@ -279,10 +286,10 @@ public class MainActivity extends AppCompatActivity {
         if (playList.isEmpty()) {
 
             Toast.makeText(this,  R.string.list_empty, Toast.LENGTH_SHORT).show();
-
             setStoppedAtribsUI();
 
         } else {
+
             if (currentSongIndex == playList.size() - 1) {
                 currentSongIndex = 0;
             } else {
@@ -307,7 +314,6 @@ public class MainActivity extends AppCompatActivity {
                         // Disallow NestedScrollView to intercept touch events.
                         view.getParent().requestDisallowInterceptTouchEvent(true);
                         break;
-
                     case MotionEvent.ACTION_UP:
                         // Allow NestedScrollView to intercept touch events.
                         view.getParent().requestDisallowInterceptTouchEvent(false);
@@ -325,9 +331,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
         return true;
-
     }
 
     @Override
@@ -345,18 +349,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void playPlayList(Activity activity) {
+
         if (playList.isEmpty()) {
+            //Lista Vazia...
             if (mp.isPlaying()) {
+                //...Mas está Tocando...
                 playPauseSong();
             } else if(pause){
+                //...Ou está em Pausa
                 playPauseSong();
             } else {
+                //...Não está tocando nem está em pausa
                 Toast.makeText(activity, R.string.list_empty, Toast.LENGTH_SHORT).show();
             }
+
         } else if(stop) {
+            //Lista não está vazia e Player está parado
             playSong(currentSongIndex);
+
         } else {
+            //Lista não está vazia e Player nõa está parado (Está Tocando ou em Pause)
             playPauseSong();
+
         }
     }
 
@@ -568,15 +582,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSelect(String path) {
 
-                SharedPreferences sharedPreferences = getSharedPreferences(
-                        "com.luizmagno.music.preferences", Context.MODE_PRIVATE);
-
-                sharedPreferences.edit().putString("directoryMusic", path).apply();
-
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtra("directoryMusic", path);
-                startActivity(intent);
-                finish();
+                putStringOnShared(activity, path);
+                startMain(activity, path);
 
             }
         });

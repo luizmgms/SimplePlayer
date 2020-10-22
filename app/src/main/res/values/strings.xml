@@ -15,7 +15,7 @@
     <string name="title_of_album">Título do Álbum - 1999 - Ao Vivo - MTV</string>
     <string name="qnt_of_músicas">00 Músicas</string>
     <string name="capa_album">Capa do Álbum</string>
-    <string name="choose_dir">Escolher Pasta</string>
+    <string name="choose_dir">Escolher Pasta dos Álbuns</string>
     <string name="name">00 Nome da Música</string>
     <string name="add_playlist">Adicionar a PlayList</string>
     <string name="add_all">Adicionar Todas a PlayList</string>
@@ -30,4 +30,11 @@
     <string name="play">Play</string>
     <string name="oculte_player">Ocultar Player</string>
     <string name="no_cape">Sem Capa</string>
+    <string name="give_permission">Dê permissão e escolha a pasta!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="musics">Músicas</string>
+    <string name="active_permission">Ative a permissão de leitura do cartão</string>
+    <string name="choose">Escolher</string>
+    <string name="all_ok">Tudo OK?</string>
 </resources>

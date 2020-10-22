@@ -1,7 +1,6 @@
 package com.luizmagno.fragmentwithviewmodel.ui.main;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,13 +19,18 @@ import com.luizmagno.fragmentwithviewmodel.utils.AsyncGetDurations;
 import com.luizmagno.fragmentwithviewmodel.utils.Music;
 import com.luizmagno.fragmentwithviewmodel.utils.MusicAdapter;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playListAdapter;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.CAPA_ALBUM;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.PATH_ALBUM;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.QNT_MUSICS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.TITLE_ALBUM;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getListMusics;
 
 public class AlbumFragment extends Fragment {
 
@@ -60,10 +64,10 @@ public class AlbumFragment extends Fragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            pathAlbum = bundle.getString("pathAlbum");
-            nameAlbum = bundle.getString("titleAlbum");
-            pathCapa = bundle.getString("capaAlbum");
-            quantMusics = bundle.getInt("qntMusics");
+            pathAlbum = bundle.getString(PATH_ALBUM);
+            nameAlbum = bundle.getString(TITLE_ALBUM);
+            pathCapa = bundle.getString(CAPA_ALBUM);
+            quantMusics = bundle.getInt(QNT_MUSICS);
         }
 
         ImageView capa = fragment.findViewById(R.id.capaAlbumId);
@@ -88,13 +92,12 @@ public class AlbumFragment extends Fragment {
         });
 
         titleAlbum.setText(nameAlbum);
-        String qnt = quantMusics + " Músicas";
+        String qnt = quantMusics + " " +
+                Objects.requireNonNull(getActivity()).getResources().getString(R.string.musics);
         qntMusicsAlbum.setText(qnt);
 
         //Lista das Músicas
-        listMusics = new ArrayList<>();
-        //Preenchendo Lista das Músicas
-        fillListMusics();
+        listMusics = getListMusics(pathAlbum);
 
         //Layout do ReclycerView
         listViewMusics.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -145,30 +148,6 @@ public class AlbumFragment extends Fragment {
         intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse(imagePath), "image/*");
         startActivity(intent);
-    }
-
-    private void fillListMusics() {
-
-        MediaPlayer mediaPlayer = new MediaPlayer();
-
-        File pastaAlbum = new File(pathAlbum);
-        File[] listaMusicas = pastaAlbum.listFiles();
-
-        if (listaMusicas != null && listaMusicas.length != 0) {
-            //Percorre a lista e verifica se algum é música
-            for (File music : listaMusicas) {
-                String name = music.getName();
-                if (name.endsWith(".mp3")) {
-                    Music m = new Music();
-                    m.setNameMusic(music.getName());
-                    m.setAbsolutePathMusic(music.getAbsolutePath());
-                    listMusics.add(m);
-                }
-            }
-
-        }
-
-        mediaPlayer.release();
     }
 
 }

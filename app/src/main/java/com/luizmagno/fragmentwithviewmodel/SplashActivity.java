@@ -1,19 +1,19 @@
 package com.luizmagno.fragmentwithviewmodel;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.luizmagno.fragmentwithviewmodel.ui.main.InitFragment;
+
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.NO_EXISTS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.checkPermissionOfReadCard;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getPathDirectoryMusicsFromShared;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.startMain;
+
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -24,9 +24,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        //Preferences
-        SharedPreferences sharedPreferences = getSharedPreferences("com.luizmagno.music.preferences", Context.MODE_PRIVATE);
-        pathDirectory = sharedPreferences.getString("directoryMusic", "noExists");
+        pathDirectory = getPathDirectoryMusicsFromShared(this);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -39,15 +37,15 @@ public class SplashActivity extends AppCompatActivity {
 
     private void replaceFragment() {
 
-        if (checkPermission()) {
+        if (checkPermissionOfReadCard(this)) {
             //Tem permissão
             //Verifica se a preferencia existe
-            if (pathDirectory.equals("noExists")) {
+            if (pathDirectory.equals(NO_EXISTS)) {
                 //Não existe. Exibe Fragmento
                 showFragment();
             } else {
                 //Existe, inicia MainActivity
-                startMain();
+                startMain(this, pathDirectory);
             }
         } else {
             //Não tem permissão, exibe fragmento
@@ -61,22 +59,8 @@ public class SplashActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, InitFragment.newInstance())
                 .commitNow();
+
         dismissAnimation();
-    }
-
-    private void startMain() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("directoryMusic", pathDirectory);
-        startActivity(intent);
-        finish();
-    }
-
-    private boolean checkPermission() {
-
-        // Check if the read permission has been granted
-        // Permission is already available
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
     }
 
     private void dismissAnimation() {
