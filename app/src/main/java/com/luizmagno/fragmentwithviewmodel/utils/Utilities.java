@@ -10,6 +10,8 @@ import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 
 import com.luizmagno.fragmentwithviewmodel.MainActivity;
+import com.luizmagno.fragmentwithviewmodel.models.Album;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,6 +28,9 @@ public class Utilities {
     public final static String CAPA_ALBUM = "capaAlbum";
     public final static String QNT_MUSICS = "qntMusics";
     public final static String ALBUM = "album";
+    public final static String VIDEO = "video";
+    public final static String PATH_VIDEO = "pathVideo";
+    public final static String PAGE_VIEW = "pageView";
 
     public final static int PERMISSION_REQUEST_READ_CARD = 0;
 
@@ -141,7 +146,8 @@ public class Utilities {
             //Percorre a lista e verifica se algum é imagem
             for (File listaMusica : listaMusicas) {
                 //Se no nome conter extensão .mp3
-                if (listaMusica.getName().endsWith(".mp3")) {
+                if (listaMusica.getName().endsWith(".mp3") ||
+                        listaMusica.getName().endsWith(".mp4")) {
                     cont++;
                 }
             }
@@ -233,7 +239,7 @@ public class Utilities {
             //Percorre a lista e verifica se algum é música
             for (File music : listaMusicas) {
                 String name = music.getName();
-                if (name.endsWith(".mp3")) {
+                if (name.endsWith(".mp3") || name.endsWith(".mp4")) {
                     Music m = new Music();
                     m.setNameMusic(music.getName());
                     m.setAbsolutePathMusic(music.getAbsolutePath());

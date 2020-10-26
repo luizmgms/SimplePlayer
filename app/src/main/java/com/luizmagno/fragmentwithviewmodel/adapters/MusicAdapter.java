@@ -1,6 +1,7 @@
-package com.luizmagno.fragmentwithviewmodel.utils;
+package com.luizmagno.fragmentwithviewmodel.adapters;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.R;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
+import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.util.ArrayList;
 
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.mp;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.notifyPlayListAdapter;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.pause;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playListAdapter;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.playPlayList;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.stop;
+import static com.luizmagno.fragmentwithviewmodel.MainActivity.videoView;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ItemMusicViewHolder>  {
 
@@ -90,9 +99,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ItemMusicVie
             public void onClick(View view) {
                 Toast.makeText(activity, R.string.add_to_list, Toast.LENGTH_SHORT).show();
                 playList.add(listMusics.get(position));
-                currentSongIndex = playList.size() - 1;
+                currentSongIndex = playList.size()-1;
                 Toast.makeText(activity, R.string.playing, Toast.LENGTH_SHORT).show();
                 playSong(currentSongIndex);
+
             }
         });
     }

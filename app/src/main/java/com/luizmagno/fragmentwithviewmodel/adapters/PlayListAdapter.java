@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.utils;
+package com.luizmagno.fragmentwithviewmodel.adapters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.luizmagno.fragmentwithviewmodel.R;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
 
 import java.util.ArrayList;
 

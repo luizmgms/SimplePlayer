@@ -37,4 +37,9 @@
     <string name="active_permission">Ative a permissão de leitura do cartão</string>
     <string name="choose">Escolher</string>
     <string name="all_ok">Tudo OK?</string>
+    <string name="id_video_view">videoViewId</string>
+    <string name="hide_show_video">Ocultar Mostrar Video</string>
+    <string name="close_video">Fechar Video</string>
+    <string name="mini_video">Minimizar Video</string>
+    <string name="enter_exit_fullscreen">Tela Cheia</string>
 </resources>

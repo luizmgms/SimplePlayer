@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.ui.main;
+package com.luizmagno.fragmentwithviewmodel.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,8 +12,8 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.utils.Album;
-import com.luizmagno.fragmentwithviewmodel.utils.PagerViewAlbumAdapter;
+import com.luizmagno.fragmentwithviewmodel.models.Album;
+import com.luizmagno.fragmentwithviewmodel.adapters.PagerViewAlbumAdapter;
 import com.luizmagno.fragmentwithviewmodel.utils.ZoomOutPageTransformer;
 
 import java.util.ArrayList;

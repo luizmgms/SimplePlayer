@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.utils;
+package com.luizmagno.fragmentwithviewmodel.models;
 
 public class Music {
     private String nameMusic;

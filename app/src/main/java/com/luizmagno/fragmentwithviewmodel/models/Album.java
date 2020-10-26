@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.utils;
+package com.luizmagno.fragmentwithviewmodel.models;
 
 public class Album {
     private String nameAlbum;

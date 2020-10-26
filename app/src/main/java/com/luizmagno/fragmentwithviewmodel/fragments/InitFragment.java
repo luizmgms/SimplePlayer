@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.ui.main;
+package com.luizmagno.fragmentwithviewmodel.fragments;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;

@@ -3,6 +3,9 @@ package com.luizmagno.fragmentwithviewmodel.utils;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 
+import com.luizmagno.fragmentwithviewmodel.adapters.MusicAdapter;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
+
 import java.io.IOException;
 import java.util.ArrayList;
 

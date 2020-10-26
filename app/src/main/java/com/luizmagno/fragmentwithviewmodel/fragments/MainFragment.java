@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.ui.main;
+package com.luizmagno.fragmentwithviewmodel.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.utils.Album;
-import com.luizmagno.fragmentwithviewmodel.utils.AlbumAdapter;
+import com.luizmagno.fragmentwithviewmodel.models.Album;
+import com.luizmagno.fragmentwithviewmodel.adapters.AlbumAdapter;
 import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.io.File;

@@ -7,7 +7,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.luizmagno.fragmentwithviewmodel.ui.main.InitFragment;
+import com.luizmagno.fragmentwithviewmodel.fragments.InitFragment;
 
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.NO_EXISTS;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.checkPermissionOfReadCard;

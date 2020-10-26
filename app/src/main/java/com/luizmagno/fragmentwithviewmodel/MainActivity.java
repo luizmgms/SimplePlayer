@@ -1,16 +1,19 @@
 package com.luizmagno.fragmentwithviewmodel;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.transition.Slide;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -18,31 +21,37 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
 import com.codekidlabs.storagechooser.StorageChooser;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.luizmagno.fragmentwithviewmodel.ui.main.MainFragment;
-import com.luizmagno.fragmentwithviewmodel.utils.Music;
-import com.luizmagno.fragmentwithviewmodel.utils.PlayListAdapter;
+import com.luizmagno.fragmentwithviewmodel.fragments.MainFragment;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
+import com.luizmagno.fragmentwithviewmodel.adapters.PlayListAdapter;
 import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.putStringOnShared;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.startMain;
 
@@ -52,8 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public static Toolbar toolbar;
     private ImageView buttonExpandBottomSheet, buttonClosePlayer;
     private LinearLayout layoutBottomSheet;
-    private BottomSheetBehavior bottomSheetBehavior;
-    private ConstraintLayout layoutPlayer;
+    private static BottomSheetBehavior bottomSheetBehavior;
     @SuppressLint("StaticFieldLeak")
     private static TextView nameMusicCurrent;
     public static ArrayList<Music> playList;
@@ -78,6 +86,21 @@ public class MainActivity extends AppCompatActivity {
 
     private Activity activity;
 
+    public static VideoView videoView;
+    public static boolean playingVideo = false;
+    private static ConstraintLayout layoutVideo;
+    private static AppBarLayout appBarLayout;
+    private boolean videoHide = false;
+    private static ImageView btnHideShowVideo;
+    private boolean fullscreen = false;
+    private static ImageView btnFullscreen;
+    private CoordinatorLayout mCoordinatorLayout;
+    private static String uriRawVideoExample;
+    private View barExpColHidBottomSheet;
+
+    private View decorView;
+    DisplayMetrics displayMetrics;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_activity);
 
         activity = this;
+
+        //video Example
+        uriRawVideoExample = "android.resource://" + getPackageName() + "/" + R.raw.example;
+
+        //LayoutMain
+        mCoordinatorLayout = findViewById(R.id.coordinator);
+
+        //Devorations
+        decorView = getWindow().getDecorView();
+        //DisplayMetrics
+        displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
 
         //WakeOn
         mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
@@ -105,6 +139,9 @@ public class MainActivity extends AppCompatActivity {
         //Click do botão
         buttonExpandBottomSheet.setOnClickListener(listenerButtonExpand());
 
+        //Barra de Expandir, Colapsar e Esconder BottomSheet
+        barExpColHidBottomSheet = findViewById(R.id.barExpandColapsHideBottomSheetId);
+
         //Botão para ocultar Player
         buttonClosePlayer = findViewById(R.id.buttonClosePlayerId);
         //click do botão;
@@ -112,14 +149,15 @@ public class MainActivity extends AppCompatActivity {
 
         //Layout do BottomShet
         layoutBottomSheet = findViewById(R.id.layout_bottom_sheet);
+        //layoutBottomSheet.setOnTouchListener(onTouchListener());
 
         //Comportamento do BottomSheet
         bottomSheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
         //Callback da mudança de estados
-        bottomSheetBehavior.setBottomSheetCallback(callbackSheetBehavior());
+        bottomSheetBehavior.addBottomSheetCallback(callbackSheetBehavior());
 
         //Layout do Player
-        layoutPlayer = findViewById(R.id.layoutPlayerId);
+        final ConstraintLayout layoutPlayer = findViewById(R.id.layoutPlayerId);
 
         //Pega altura do Player
         getHeightOfLayoutView(layoutPlayer);
@@ -138,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         //PlayList
-        ListView playListView = findViewById(R.id.playListId);
+        final ListView playListView = findViewById(R.id.playListId);
 
         //Inicializando PlayList
         playList = new ArrayList<>();
@@ -193,13 +231,197 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 playList.clear();
+                currentSongIndex = 0;
                 playListAdapter.notifyDataSetChanged();
             }
         });
 
-        //OnCompletionListener
+        //OnCompletionListenerMusic
         mp.setOnCompletionListener(onCompletionListener());
 
+        //LayoutVideo
+        layoutVideo = findViewById(R.id.layoutVideoId);
+        layoutVideo.setOnTouchListener(onTouchListener());
+
+        //VideoView
+        videoView = findViewById(R.id.videoViewId);
+
+        //OnCompletionListenerVideo
+        videoView.setOnCompletionListener(onCompletionVideoListener());
+
+        //AppBarLayout
+        appBarLayout = findViewById(R.id.app_bar_layout);
+
+        //Botão fechar Video
+        btnHideShowVideo = findViewById(R.id.btnHideShowVideoId);
+        btnHideShowVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (videoHide) {
+                    ViewCompat.setElevation(layoutVideo, 8);
+                    btnHideShowVideo.setImageResource(R.drawable.ic_video_off);
+                    videoHide = false;
+                } else {
+                    ViewCompat.setElevation(layoutVideo, -8);
+                    btnHideShowVideo.setImageResource(R.drawable.ic_video_on);
+                    videoHide = true;
+                }
+                
+            }
+        });
+
+        //Botão FullScreenMode
+        btnFullscreen = findViewById(R.id.buttonFullscreenId);
+        btnFullscreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fullscreenMode();
+            }
+        });
+
+
+    }
+
+    private int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    private int getNavBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    private void fullscreenMode() {
+
+            if (fullscreen && playingVideo) {
+                //Está em tela cheia e tocando Video
+                //Modo fullscreen vai para false
+                fullscreen = false;
+                //Set Image de botões e barra
+                //Image Fullscreen
+                btnFullscreen.setImageResource(R.drawable.ic_fullscreen);
+                //Fica Visivel
+                btnHideShowVideo.setVisibility(View.VISIBLE);
+                barExpColHidBottomSheet.setVisibility(View.VISIBLE);
+                //Orientação vai para retrato
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                //Volta decorations
+                int uiOptions =
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
+                //Redefine Margins
+                postDelayedDimensions();
+
+
+            } else if (playingVideo && !videoHide) {
+                //Não está em tela cheia, mas está tocando video e tela de video não está escondida
+                //Fullscreen vai para true
+                fullscreen = true;
+                //SetImage de botões e barra
+                //Vai para fullscreen exit
+                btnFullscreen.setImageResource(R.drawable.ic_fullscreen_exit);
+                //Fica Invisivel
+                btnHideShowVideo.setVisibility(View.INVISIBLE);
+                barExpColHidBottomSheet.setVisibility(View.INVISIBLE);
+                //Orientação vai para Paisagem
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+                //Esconde decorations
+                int uiOptions =
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
+                //Redefine dimensões
+                postDelayedDimensions();
+                //Esconde BottomSheet
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            }
+
+    }
+
+    private void postDelayedDimensions() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                ViewGroup.LayoutParams childLayoutParams = layoutVideo.getLayoutParams();
+
+                childLayoutParams.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
+
+                int orientation = getResources().getConfiguration().orientation;
+
+                ViewGroup.MarginLayoutParams cLayParmsCoo =
+                        (ViewGroup.MarginLayoutParams) mCoordinatorLayout.getLayoutParams();
+
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+                    cLayParmsCoo.setMargins(0, getStatusBarHeight(), 0, getNavBarHeight());
+                    mCoordinatorLayout.setLayoutParams(cLayParmsCoo);
+
+                    childLayoutParams.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+
+                } else {
+
+                    cLayParmsCoo.setMargins(0, 0, 0, 0);
+                    mCoordinatorLayout.setLayoutParams(cLayParmsCoo);
+
+                    childLayoutParams.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                }
+
+                layoutVideo.setLayoutParams(childLayoutParams);
+            }
+        }, 500);
+    }
+
+    private MediaPlayer.OnCompletionListener onCompletionVideoListener () {
+        return (new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+
+                videoView.stopPlayback();
+                layoutVideo.setVisibility(View.INVISIBLE);
+                btnHideShowVideo.setVisibility(View.INVISIBLE);
+                btnFullscreen.setVisibility(View.INVISIBLE);
+
+                playingVideo = false;
+
+                if (!playList.isEmpty()) {
+                    //Se a PlayList não estiver vazia
+                    if (currentSongIndex == playList.size() - 1) {
+                        //Música que está tocando é a última da lista, então parar de tocar
+                        setStoppedAtribsUI();
+                    } else {
+                        //Não é a última então toque a próxima música
+                        mp.stop();
+                        stop = true;
+                        pause = false;
+                        currentSongIndex++;
+                        notifyPlayListAdapter();
+                        playPlayList(activity);
+                    }
+
+                } else {
+                    //Lista está vazia
+                    setStoppedAtribsUI();
+                }
+            }
+        });
     }
 
     private MediaPlayer.OnCompletionListener onCompletionListener() {
@@ -235,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
      * Update timer on progressBar
      * */
     public static void updateProgressBar() {
-        mHandler.postDelayed(mUpdateTimeTask, 50);
+        mHandler.postDelayed(mUpdateTimeTask, 100);
     }
 
     /**
@@ -243,8 +465,18 @@ public class MainActivity extends AppCompatActivity {
      * */
     private static Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
-            long totalDuration = mp.getDuration();
-            long currentDuration = mp.getCurrentPosition();
+
+            long totalDuration;
+            long currentDuration;
+
+            if (playingVideo) {
+                totalDuration = videoView.getDuration();
+                currentDuration = videoView.getCurrentPosition();
+            } else {
+                totalDuration = mp.getDuration();
+                currentDuration = mp.getCurrentPosition();
+            }
+
 
             // Displaying Total Duration time ans time completed
             String total = utils.milliSecondsToTimer(totalDuration);
@@ -257,48 +489,60 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setProgress(progress);
 
             // Running this thread after 50 milliseconds
-            mHandler.postDelayed(this, 50);
+            mHandler.postDelayed(this, 100);
         }
     };
 
     private void previousMusic () {
         if (playList.isEmpty()) {
-
-            Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
-            setStoppedAtribsUI();
+            //Se a playList está vazia...
+            if (mp.isPlaying() || playingVideo || pause) {
+                //Mas está tocando ou em pausa...
+                Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
+            } else {
+                //Não está tocando nem está em pausa
+                Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
+                setStoppedAtribsUI();
+            }
 
         } else {
-
+            //A playList não está vazia
             if (currentSongIndex == 0) {
+                //Se for a primeira...
                 currentSongIndex = playList.size() - 1;
             } else {
+                //Se não...
                 currentSongIndex--;
             }
-            stop = true;
-            pause = false;
-            notifyPlayListAdapter();
-            playPlayList(activity);
+
+            playSong(currentSongIndex);
 
         }
     }
 
     private void nextMusic() {
         if (playList.isEmpty()) {
-
-            Toast.makeText(this,  R.string.list_empty, Toast.LENGTH_SHORT).show();
-            setStoppedAtribsUI();
+            //Se a playList tá vazia
+            if (mp.isPlaying() || playingVideo || pause) {
+                //...Mas tá tocando ou está em pausa
+                Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
+            } else {
+                //...Não está tocando e nem está em pausa
+                Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
+                setStoppedAtribsUI();
+            }
 
         } else {
-
+            //A playList não está vazia
             if (currentSongIndex == playList.size() - 1) {
+                //se for a última...
                 currentSongIndex = 0;
             } else {
+                //Se não...
                 currentSongIndex++;
             }
-            stop = true;
-            pause = false;
-            notifyPlayListAdapter();
-            playPlayList(activity);
+
+            playSong(currentSongIndex);
         }
     }
 
@@ -352,7 +596,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (playList.isEmpty()) {
             //Lista Vazia...
-            if (mp.isPlaying()) {
+            if (mp.isPlaying() || playingVideo) {
                 //...Mas está Tocando...
                 playPauseSong();
             } else if(pause){
@@ -376,60 +620,114 @@ public class MainActivity extends AppCompatActivity {
 
     private static void playPauseSong() {
 
-        // check for already playing
-        if(mp.isPlaying()){
-            if(mp!=null){
-                mp.pause();
+        //O que está tocando é video?
+        if (playingVideo) {
+            if (videoView.isPlaying()) {
+                videoView.pause();
                 // Changing button image to play button
                 buttonPlay.setImageResource(R.drawable.ic_play);
                 pause = true;
                 notifyPlayListAdapter();
-            }
-        }else{
-            // Resume song
-            if(mp!=null){
-                mp.start();
+            } else {
+                videoView.start();
                 // Changing button image to pause button
                 buttonPlay.setImageResource(R.drawable.ic_pause);
                 pause = false;
                 notifyPlayListAdapter();
+            }
+        } else {
+
+            // check for already playing
+            if (mp.isPlaying()) {
+                if (mp != null) {
+                    mp.pause();
+                    // Changing button image to play button
+                    buttonPlay.setImageResource(R.drawable.ic_play);
+                    pause = true;
+                    notifyPlayListAdapter();
+                }
+            } else {
+                // Resume song
+                if (mp != null) {
+                    mp.start();
+                    // Changing button image to pause button
+                    buttonPlay.setImageResource(R.drawable.ic_pause);
+                    pause = false;
+                    notifyPlayListAdapter();
+                }
             }
         }
     }
 
     public static void playSong(int songIndex){
         // Play song
-        try {
-            mp.reset();
-            mp.setDataSource(playList.get(songIndex).getAbsolutePathMusic());
-            mp.prepare();
-            mp.start();
+        String pathSong = playList.get(songIndex).getAbsolutePathMusic();
 
-            //Set Stop para falso
-            stop = false;
+        //Se for Video
+        if (pathSong.endsWith(".mp4")) {
+            mp.stop();
+            layoutVideo.setVisibility(View.VISIBLE);
+            btnHideShowVideo.setVisibility(View.VISIBLE);
+            btnFullscreen.setVisibility(View.VISIBLE);
 
-            //Set Pause para falso
+            videoView.setVideoPath(pathSong);
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    videoView.start();
+                }
+            });
+
+            playingVideo = true;
+            updateUIPlayer(songIndex);
+
+        } else {
+            //Se não for vídeo...
+            layoutVideo.setVisibility(View.INVISIBLE);
+            btnHideShowVideo.setVisibility(View.INVISIBLE);
+            btnFullscreen.setVisibility(View.VISIBLE);
+            videoView.stopPlayback();
+            playingVideo = false;
+            stop = true;
             pause = false;
-
-            //Notify Adapter para mudança de cor do texto
             notifyPlayListAdapter();
 
-            // Displaying Song title
-            nameMusicCurrent.setText(playList.get(songIndex).getNameMusic());
+            try {
+                mp.reset();
+                mp.setDataSource(pathSong);
+                mp.prepare();
+                mp.start();
 
-            // Changing Button Image to pause image
-            buttonPlay.setImageResource(R.drawable.ic_pause);
+                updateUIPlayer(songIndex);
 
-            // set Progress bar values
-            progressBar.setProgress(0);
-            progressBar.setMax(100);
-
-            // Updating progress bar
-            updateProgressBar();
-
-        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
-            e.printStackTrace();
+            } catch (IllegalArgumentException | IllegalStateException | IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public static void updateUIPlayer(int songIndex) {
+        //Set Stop para falso
+        stop = false;
+
+        //Set Pause para falso
+        pause = false;
+
+        //Notify Adapter para mudança de cor do texto
+        notifyPlayListAdapter();
+
+        // Displaying Song title
+        nameMusicCurrent.setText(playList.get(songIndex).getNameMusic());
+
+        // Changing Button Image to pause image
+        buttonPlay.setImageResource(R.drawable.ic_pause);
+
+        // set Progress bar values
+        progressBar.setProgress(0);
+        progressBar.setMax(100);
+
+        // Updating progress bar
+        updateProgressBar();
     }
 
     public static void notifyPlayListAdapter() {
@@ -464,7 +762,6 @@ public class MainActivity extends AppCompatActivity {
         final ViewGroup.LayoutParams childLayoutParams = layoutBottomSheet.getLayoutParams();
         final DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         childLayoutParams.height = displayMetrics.heightPixels;
-
         layoutBottomSheet.setLayoutParams(childLayoutParams);
     }
 
@@ -472,14 +769,14 @@ public class MainActivity extends AppCompatActivity {
         peekHeigth do BottomSheet, a altura do player é dada em pixels,
         como a altura do botão é em dp, precisa-se converter de dp para px
     */
-    private void getHeightOfLayoutView(final View v) {
+    private static void getHeightOfLayoutView(final View v) {
         ViewTreeObserver viewTreeObserver = v.getViewTreeObserver();
         viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
 
                 v.getViewTreeObserver().removeOnPreDrawListener(this);
-                int heightPxFromPlayer = layoutPlayer.getMeasuredHeight();
+                int heightPxFromPlayer = v.getMeasuredHeight();
                 bottomSheetBehavior.setPeekHeight(heightPxFromPlayer);
                 return true;
 
@@ -488,13 +785,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*private int convertDpToPx(int dp) {
-        DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
+    private int convertDpToPx(int dp) {
+        displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         float density = displayMetrics.density;
         return (int) ((dp*density) + 0.5);
     }
 
-    private int convertPxtoDp(int px) {
+    /*private int convertPxtoDp(int px) {
         DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         float density = displayMetrics.density;
         return (int) ((px/density) + 0.5);
@@ -599,9 +896,22 @@ public class MainActivity extends AppCompatActivity {
 
         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else {
+        } else if (fullscreen) {
+            fullscreenMode();
+        }else {
             toolbar.setTitle(R.string.app_name);
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mp.isPlaying()) {
+            mp.pause();
+        }
+        if (videoView.isPlaying()) {
+            videoView.pause();
         }
     }
 
@@ -610,6 +920,9 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (mp != null) {
             mp.release();
+        }
+        if (videoView != null) {
+            videoView.stopPlayback();
         }
         mHandler.removeCallbacks(mUpdateTimeTask);
     }
@@ -626,6 +939,24 @@ public class MainActivity extends AppCompatActivity {
         timeCurrent.setText(R.string.time);
         timeTotal.setText(R.string.time);
         notifyPlayListAdapter();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (playingVideo) {
+
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                appBarLayout.setExpanded(false, true);
+
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                //Retrato
+                appBarLayout.setExpanded(true, true);
+            }
+
+        }
+
     }
 
 }

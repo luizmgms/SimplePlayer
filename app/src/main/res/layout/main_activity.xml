@@ -20,12 +20,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:layout_collapseMode="pin"
+            app:layout_scrollFlags="scroll|enterAlways" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- include main content -->
     <include layout="@layout/content_main" />
+
+    <!-- include layoutVideo -->
+    <include layout="@layout/video_layout" />
 
     <!-- include botões expande close player -->
     <include layout="@layout/expand_close_player" />

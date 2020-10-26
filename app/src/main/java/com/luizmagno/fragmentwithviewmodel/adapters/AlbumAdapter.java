@@ -1,7 +1,6 @@
-package com.luizmagno.fragmentwithviewmodel.utils;
+package com.luizmagno.fragmentwithviewmodel.adapters;
 
 import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,9 +17,10 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.ui.main.ViewPagerAlbumFragment;
+import com.luizmagno.fragmentwithviewmodel.fragments.ViewPagerAlbumFragment;
+import com.luizmagno.fragmentwithviewmodel.models.Album;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
@@ -28,6 +28,7 @@ import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
 import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.ALBUM;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
+import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.PAGE_VIEW;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.POSITION;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getListMusics;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getPathDirectoryMusicsFromShared;
@@ -109,7 +110,8 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
 
                 ((FragmentActivity)view.getContext()).getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.container, fragment).addToBackStack(ALBUM)
+                        .replace(R.id.container, fragment)
+                        .addToBackStack(PAGE_VIEW)
                         .commit();
 
                 toolbar.setTitle(album.getNameAlbum());

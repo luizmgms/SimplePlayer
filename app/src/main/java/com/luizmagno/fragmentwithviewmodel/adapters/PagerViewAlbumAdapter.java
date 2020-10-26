@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.utils;
+package com.luizmagno.fragmentwithviewmodel.adapters;
 
 import android.os.Bundle;
 
@@ -7,7 +7,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.luizmagno.fragmentwithviewmodel.ui.main.AlbumFragment;
+import com.luizmagno.fragmentwithviewmodel.fragments.AlbumFragment;
+import com.luizmagno.fragmentwithviewmodel.models.Album;
 
 import java.util.ArrayList;
 

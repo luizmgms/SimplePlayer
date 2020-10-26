@@ -1,4 +1,4 @@
-package com.luizmagno.fragmentwithviewmodel.ui.main;
+package com.luizmagno.fragmentwithviewmodel.fragments;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.utils.AsyncGetDurations;
-import com.luizmagno.fragmentwithviewmodel.utils.Music;
-import com.luizmagno.fragmentwithviewmodel.utils.MusicAdapter;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
+import com.luizmagno.fragmentwithviewmodel.adapters.MusicAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
