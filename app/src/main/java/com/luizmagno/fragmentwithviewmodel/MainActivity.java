@@ -1,7 +1,6 @@
 package com.luizmagno.fragmentwithviewmodel;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -12,8 +11,6 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.transition.Slide;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -21,11 +18,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +30,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
@@ -44,9 +38,9 @@ import com.codekidlabs.storagechooser.StorageChooser;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.luizmagno.fragmentwithviewmodel.adapters.PlayListAdapter;
 import com.luizmagno.fragmentwithviewmodel.fragments.MainFragment;
 import com.luizmagno.fragmentwithviewmodel.models.Music;
-import com.luizmagno.fragmentwithviewmodel.adapters.PlayListAdapter;
 import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.io.IOException;
@@ -57,8 +51,7 @@ import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.startMain;
 
 public class MainActivity extends AppCompatActivity {
 
-    @SuppressLint("StaticFieldLeak")
-    public static Toolbar toolbar;
+    public Toolbar toolbar;
     private ImageView buttonExpandBottomSheet, buttonClosePlayer;
     private LinearLayout layoutBottomSheet;
     private static BottomSheetBehavior bottomSheetBehavior;
@@ -86,20 +79,23 @@ public class MainActivity extends AppCompatActivity {
 
     private Activity activity;
 
+    @SuppressLint("StaticFieldLeak")
     public static VideoView videoView;
     public static boolean playingVideo = false;
     private static ConstraintLayout layoutVideo;
     private static AppBarLayout appBarLayout;
     private boolean videoHide = false;
+    @SuppressLint("StaticFieldLeak")
     private static ImageView btnHideShowVideo;
     private boolean fullscreen = false;
+    @SuppressLint("StaticFieldLeak")
     private static ImageView btnFullscreen;
     private CoordinatorLayout mCoordinatorLayout;
-    private static String uriRawVideoExample;
     private View barExpColHidBottomSheet;
+    @SuppressLint("StaticFieldLeak")
+    private static ImageView btnPlayInVideoView;
 
     private View decorView;
-    DisplayMetrics displayMetrics;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -110,15 +106,13 @@ public class MainActivity extends AppCompatActivity {
         activity = this;
 
         //video Example
-        uriRawVideoExample = "android.resource://" + getPackageName() + "/" + R.raw.example;
+        String uriRawVideoExample = "android.resource://" + getPackageName() + "/" + R.raw.example;
 
         //LayoutMain
         mCoordinatorLayout = findViewById(R.id.coordinator);
 
         //Devorations
         decorView = getWindow().getDecorView();
-        //DisplayMetrics
-        displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
 
         //WakeOn
         mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
@@ -241,10 +235,20 @@ public class MainActivity extends AppCompatActivity {
 
         //LayoutVideo
         layoutVideo = findViewById(R.id.layoutVideoId);
-        layoutVideo.setOnTouchListener(onTouchListener());
+        layoutVideo.setOnTouchListener(onTouchVideoListener());
+        //Botão Play in Video
+        btnPlayInVideoView = findViewById(R.id.btnPlayInVideoViewId);
 
         //VideoView
         videoView = findViewById(R.id.videoViewId);
+        /* BUG
+        * A primeira vez que vai tocar um vídeo ele lança uma exceção e chama
+        * o onCompletionListener, mas toca o vídeo correspondente.
+        * Por isso as duas linhas abaixo de código servem para, não corrigir, mas
+        * burlar esse BUG. Ele toca uma video de exemplo no onCreate.
+        * */
+        videoView.setVideoURI(Uri.parse(uriRawVideoExample));
+        videoView.start();
 
         //OnCompletionListenerVideo
         videoView.setOnCompletionListener(onCompletionVideoListener());
@@ -252,18 +256,30 @@ public class MainActivity extends AppCompatActivity {
         //AppBarLayout
         appBarLayout = findViewById(R.id.app_bar_layout);
 
-        //Botão fechar Video
+        //Botão Esconder/Mostrar Video
         btnHideShowVideo = findViewById(R.id.btnHideShowVideoId);
         btnHideShowVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (videoHide) {
+                    //Se o video está escondido...
+                    //Aumenta sua elevação para mostrar
                     ViewCompat.setElevation(layoutVideo, 8);
+                    //Muda imagem do botão para video off
                     btnHideShowVideo.setImageResource(R.drawable.ic_video_off);
+                    //Botão fullscreen fica visivel
+                    btnFullscreen.setVisibility(View.VISIBLE);
+                    //set videoHide para false
                     videoHide = false;
                 } else {
+                    //Video não está escondido...
+                    //Baixa sua elevação para esconder
                     ViewCompat.setElevation(layoutVideo, -8);
+                    //Muda imagem do botão para video on
                     btnHideShowVideo.setImageResource(R.drawable.ic_video_on);
+                    //Botão fullscreen fica invisivel
+                    btnFullscreen.setVisibility(View.INVISIBLE);
+                    //set videoHide para true
                     videoHide = true;
                 }
                 
@@ -320,8 +336,9 @@ public class MainActivity extends AppCompatActivity {
                                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
                 decorView.setSystemUiVisibility(uiOptions);
-                //Redefine Margins
                 postDelayedDimensions();
+                //Mostra BottomSheet
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
             } else if (playingVideo && !videoHide) {
@@ -463,7 +480,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Background Runnable thread
      * */
-    private static Runnable mUpdateTimeTask = new Runnable() {
+    private static final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
 
             long totalDuration;
@@ -572,6 +589,67 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    private View.OnTouchListener onTouchVideoListener() {
+        return (new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                int action = motionEvent.getAction();
+
+                if (fullscreen && playingVideo) {
+                    if (action == MotionEvent.ACTION_DOWN) {
+                        // Disallow NestedScrollView to intercept touch events.
+                        view.getParent().requestDisallowInterceptTouchEvent(true);
+                    } else if (action == MotionEvent.ACTION_UP) {
+
+
+                        //Mostrar botão
+                        btnPlayInVideoView.setVisibility(View.VISIBLE);
+                        btnPlayInVideoView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                playPauseSong();
+                            }
+                        });
+
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                btnPlayInVideoView.setVisibility(View.INVISIBLE);
+                            }
+                        }, 5000);
+
+
+                    }
+
+
+                } else {
+
+
+                    switch (action) {
+                        case MotionEvent.ACTION_DOWN:
+                            // Disallow NestedScrollView to intercept touch events.
+                            view.getParent().requestDisallowInterceptTouchEvent(true);
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            // Allow NestedScrollView to intercept touch events.
+                            view.getParent().requestDisallowInterceptTouchEvent(false);
+                            break;
+                    }
+
+                    // Handle ListView touch events.
+                    view.onTouchEvent(motionEvent);
+
+                }
+
+
+                return true;
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -626,15 +704,16 @@ public class MainActivity extends AppCompatActivity {
                 videoView.pause();
                 // Changing button image to play button
                 buttonPlay.setImageResource(R.drawable.ic_play);
+                btnPlayInVideoView.setImageResource(R.drawable.ic_play);
                 pause = true;
-                notifyPlayListAdapter();
             } else {
                 videoView.start();
                 // Changing button image to pause button
                 buttonPlay.setImageResource(R.drawable.ic_pause);
+                btnPlayInVideoView.setImageResource(R.drawable.ic_pause);
                 pause = false;
-                notifyPlayListAdapter();
             }
+            notifyPlayListAdapter();
         } else {
 
             // check for already playing
@@ -665,32 +744,30 @@ public class MainActivity extends AppCompatActivity {
 
         //Se for Video
         if (pathSong.endsWith(".mp4")) {
+            //Parar musicPlayer
             mp.stop();
+            //Mostrar botões de controle de video
             layoutVideo.setVisibility(View.VISIBLE);
             btnHideShowVideo.setVisibility(View.VISIBLE);
             btnFullscreen.setVisibility(View.VISIBLE);
-
+            //Set video in Playback
             videoView.setVideoPath(pathSong);
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mediaPlayer) {
-                    videoView.start();
-                }
-            });
-
+            videoView.start();
+            //Tocando video is true
             playingVideo = true;
+            //Atualizar interfaces
             updateUIPlayer(songIndex);
 
         } else {
             //Se não for vídeo...
+            //Ocultar botões de vídeo
             layoutVideo.setVisibility(View.INVISIBLE);
             btnHideShowVideo.setVisibility(View.INVISIBLE);
-            btnFullscreen.setVisibility(View.VISIBLE);
+            btnFullscreen.setVisibility(View.INVISIBLE);
+            //Para videoPlayer
             videoView.stopPlayback();
+            //Tocando vídeo is false
             playingVideo = false;
-            stop = true;
-            pause = false;
-            notifyPlayListAdapter();
 
             try {
                 mp.reset();
@@ -785,11 +862,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private int convertDpToPx(int dp) {
+    /*private int convertDpToPx(int dp) {
         displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         float density = displayMetrics.density;
         return (int) ((dp*density) + 0.5);
-    }
+    }*/
 
     /*private int convertPxtoDp(int px) {
         DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
@@ -959,4 +1036,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public static PlayListAdapter getPlayListAdapter() {
+        return playListAdapter;
+    }
 }

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -19,7 +20,6 @@ import com.luizmagno.fragmentwithviewmodel.utils.ZoomOutPageTransformer;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.toolbar;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.POSITION;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getListAlbuns;
@@ -27,6 +27,7 @@ import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getListAlbuns;
 public class ViewPagerAlbumFragment extends Fragment {
 
     private ArrayList<Album> listAlbuns;
+    private Toolbar toolbar;
 
     public static ViewPagerAlbumFragment newInstance() {
         return new ViewPagerAlbumFragment();
@@ -42,24 +43,29 @@ public class ViewPagerAlbumFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+        //Inflate Fragment
         View fragment = inflater.inflate(R.layout.view_pager_album_fragment,container, false);
-
+        //Get Directory dos Álbuns
         assert getArguments() != null;
         String pathAlbuns = getArguments().getString(DIRECTORY_MUSICS);
+        //Get Posição do Click
         final int position = getArguments().getInt(POSITION);
-
+        //Get Lista de Álbuns
         listAlbuns = getListAlbuns(pathAlbuns);
-
+        //ViewPager in Fragment
         ViewPager viewPager = fragment.findViewById(R.id.viewPagerAlbumId);
-
+        //Toolbar in MainActivity
+        toolbar = getActivity().findViewById(R.id.toolbar);
+        //Pager Adapter
         PagerAdapter pagerAdapter = new PagerViewAlbumAdapter(
                 Objects.requireNonNull(getActivity()).getSupportFragmentManager(), listAlbuns);
-
+        //Set Pager Adapter in viewPager
         viewPager.setAdapter(pagerAdapter);
+        //Set Posição atual
         viewPager.setCurrentItem(position);
-
+        //Listener de set Toolbar Title
         viewPager.addOnPageChangeListener(onPageChangeListener());
-
+        //Set Animação de Transição
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         return fragment;
