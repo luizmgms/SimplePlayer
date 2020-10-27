@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.utils.AsyncGetDurations;
 import com.luizmagno.fragmentwithviewmodel.models.Music;
@@ -22,10 +23,6 @@ import com.luizmagno.fragmentwithviewmodel.adapters.MusicAdapter;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.playListAdapter;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.CAPA_ALBUM;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.PATH_ALBUM;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.QNT_MUSICS;
@@ -40,14 +37,14 @@ public class AlbumFragment extends Fragment {
     private int quantMusics;
     private ArrayList<Music> listMusics;
     private MusicAdapter musicAdapter;
-    //private ProgressBar loadingDurations;
+    private final MainActivity mainActivity;
 
-    public AlbumFragment() {
-        // Required empty public constructor
+    public AlbumFragment(MainActivity activity) {
+        this.mainActivity = activity;
     }
 
-    public static AlbumFragment newInstance() {
-       return new AlbumFragment();
+    public static AlbumFragment newInstance(MainActivity activity) {
+       return new AlbumFragment(activity);
     }
 
     @Override
@@ -103,7 +100,7 @@ public class AlbumFragment extends Fragment {
         listViewMusics.setLayoutManager(new LinearLayoutManager(getContext()));
 
         //Adapter da lista da Músicas
-        musicAdapter = new MusicAdapter(listMusics, getActivity());
+        musicAdapter = new MusicAdapter(listMusics, mainActivity);
         listViewMusics.setAdapter(musicAdapter);
         listViewMusics.setHasFixedSize(true);
 
@@ -114,8 +111,8 @@ public class AlbumFragment extends Fragment {
             public void onClick(View view) {
                 Toast.makeText(getActivity(), R.string.added_all_to_playlist,
                         Toast.LENGTH_SHORT).show();
-                playList.addAll(listMusics);
-                playListAdapter.notifyDataSetChanged();
+                mainActivity.playList.addAll(listMusics);
+                mainActivity.playListAdapter.notifyDataSetChanged();
             }
         });
 
@@ -124,10 +121,10 @@ public class AlbumFragment extends Fragment {
         btnPlayAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                currentSongIndex = playList.size();
-                playList.addAll(listMusics);
+                mainActivity.currentSongIndex = mainActivity.playList.size();
+                mainActivity.playList.addAll(listMusics);
                 Toast.makeText(getActivity(), R.string.playing, Toast.LENGTH_SHORT).show();
-                playSong(currentSongIndex);
+                mainActivity.playSong(mainActivity.currentSongIndex);
             }
         });
 

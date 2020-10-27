@@ -12,13 +12,13 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.models.Album;
 import com.luizmagno.fragmentwithviewmodel.adapters.PagerViewAlbumAdapter;
+import com.luizmagno.fragmentwithviewmodel.models.Album;
 import com.luizmagno.fragmentwithviewmodel.utils.ZoomOutPageTransformer;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.POSITION;
@@ -28,9 +28,14 @@ public class ViewPagerAlbumFragment extends Fragment {
 
     private ArrayList<Album> listAlbuns;
     private Toolbar toolbar;
+    private final MainActivity mainActivity;
 
-    public static ViewPagerAlbumFragment newInstance() {
-        return new ViewPagerAlbumFragment();
+    public ViewPagerAlbumFragment(MainActivity mActivity) {
+        this.mainActivity = mActivity;
+    }
+
+    public static ViewPagerAlbumFragment newInstance(MainActivity mActivity) {
+        return new ViewPagerAlbumFragment(mActivity);
     }
 
     @Override
@@ -58,7 +63,7 @@ public class ViewPagerAlbumFragment extends Fragment {
         toolbar = getActivity().findViewById(R.id.toolbar);
         //Pager Adapter
         PagerAdapter pagerAdapter = new PagerViewAlbumAdapter(
-                Objects.requireNonNull(getActivity()).getSupportFragmentManager(), listAlbuns);
+                mainActivity.getSupportFragmentManager(), listAlbuns, mainActivity);
         //Set Pager Adapter in viewPager
         viewPager.setAdapter(pagerAdapter);
         //Set Posição atual

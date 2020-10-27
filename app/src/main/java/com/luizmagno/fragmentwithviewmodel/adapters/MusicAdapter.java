@@ -1,6 +1,5 @@
 package com.luizmagno.fragmentwithviewmodel.adapters;
 
-import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +10,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.models.Music;
 import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.util.ArrayList;
 
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.getPlayListAdapter;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
-
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ItemMusicViewHolder>  {
 
     private final ArrayList<Music> listMusics;
-    private final Activity activity;
+    private final MainActivity activity;
 
     //InnerClass
     public static class ItemMusicViewHolder extends RecyclerView.ViewHolder {
@@ -43,7 +38,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ItemMusicVie
         }
     }
 
-    public MusicAdapter(ArrayList<Music> musics, Activity activity) {
+    public MusicAdapter(ArrayList<Music> musics, MainActivity activity) {
         this.listMusics = musics;
         this.activity = activity;
     }
@@ -82,8 +77,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ItemMusicVie
             @Override
             public void onClick(View view) {
                 Toast.makeText(activity, R.string.add_to_list, Toast.LENGTH_SHORT).show();
-                playList.add(listMusics.get(position));
-                getPlayListAdapter().notifyDataSetChanged();
+                activity.playList.add(listMusics.get(position));
+                activity.playListAdapter.notifyDataSetChanged();
 
             }
         });
@@ -92,10 +87,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ItemMusicVie
             @Override
             public void onClick(View view) {
                 Toast.makeText(activity, R.string.add_to_list, Toast.LENGTH_SHORT).show();
-                playList.add(listMusics.get(position));
-                currentSongIndex = playList.size()-1;
+                activity.playList.add(listMusics.get(position));
+                activity.currentSongIndex = activity.playList.size() - 1;
                 Toast.makeText(activity, R.string.playing, Toast.LENGTH_SHORT).show();
-                playSong(currentSongIndex);
+                activity.playSong(activity.currentSongIndex);
 
             }
         });

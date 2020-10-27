@@ -51,49 +51,41 @@ import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.startMain;
 
 public class MainActivity extends AppCompatActivity {
 
-    public Toolbar toolbar;
+    private Toolbar toolbar;
     private ImageView buttonExpandBottomSheet, buttonClosePlayer;
     private LinearLayout layoutBottomSheet;
-    private static BottomSheetBehavior bottomSheetBehavior;
-    @SuppressLint("StaticFieldLeak")
-    private static TextView nameMusicCurrent;
-    public static ArrayList<Music> playList;
-    @SuppressLint("StaticFieldLeak")
-    public static PlayListAdapter playListAdapter;
+    @SuppressWarnings("rawtypes")
+    public BottomSheetBehavior bottomSheetBehavior;
+    private TextView nameMusicCurrent;
+    public ArrayList<Music> playList;
+    public PlayListAdapter playListAdapter;
 
-    public static boolean stop = true;
-    public static boolean pause = false;
-    public static int currentSongIndex = 0;
-    @SuppressLint("StaticFieldLeak")
-    private static ProgressBar progressBar;
-    private static Handler mHandler = new Handler();
-    private static Utilities utils = new Utilities();
-    @SuppressLint("StaticFieldLeak")
-    private static TextView timeCurrent;
-    @SuppressLint("StaticFieldLeak")
-    private static TextView timeTotal;
+    public boolean stop = true;
+    public boolean pause = false;
+    public int currentSongIndex = 0;
+    private ProgressBar progressBar;
+    private final Handler mHandler = new Handler();
+    private final Utilities utils = new Utilities();
+    private TextView timeCurrent;
+    private TextView timeTotal;
 
-    private static FloatingActionButton buttonPlay;
+    private FloatingActionButton buttonPlay;
 
-    public static MediaPlayer mp = new MediaPlayer();
+    public MediaPlayer mp = new MediaPlayer();
 
     private Activity activity;
 
-    @SuppressLint("StaticFieldLeak")
-    public static VideoView videoView;
-    public static boolean playingVideo = false;
-    private static ConstraintLayout layoutVideo;
-    private static AppBarLayout appBarLayout;
+    public VideoView videoView;
+    public boolean playingVideo = false;
+    private ConstraintLayout layoutVideo;
+    private AppBarLayout appBarLayout;
     private boolean videoHide = false;
-    @SuppressLint("StaticFieldLeak")
-    private static ImageView btnHideShowVideo;
+    private ImageView btnHideShowVideo;
     private boolean fullscreen = false;
-    @SuppressLint("StaticFieldLeak")
-    private static ImageView btnFullscreen;
+    private ImageView btnFullscreen;
     private CoordinatorLayout mCoordinatorLayout;
     private View barExpColHidBottomSheet;
-    @SuppressLint("StaticFieldLeak")
-    private static ImageView btnPlayInVideoView;
+    private ImageView btnPlayInVideoView;
 
     private View decorView;
 
@@ -122,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Fragment
-        Fragment fragment = MainFragment.newInstance();
+        Fragment fragment = MainFragment.newInstance(this);
         fragment.setExitTransition(new Slide());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
@@ -473,14 +465,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Update timer on progressBar
      * */
-    public static void updateProgressBar() {
+    public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
 
     /**
      * Background Runnable thread
      * */
-    private static final Runnable mUpdateTimeTask = new Runnable() {
+    private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
 
             long totalDuration;
@@ -670,7 +662,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static void playPlayList(Activity activity) {
+    public void playPlayList(Activity activity) {
 
         if (playList.isEmpty()) {
             //Lista Vazia...
@@ -696,7 +688,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static void playPauseSong() {
+    private void playPauseSong() {
 
         //O que está tocando é video?
         if (playingVideo) {
@@ -738,7 +730,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void playSong(int songIndex){
+    public void playSong(int songIndex){
         // Play song
         String pathSong = playList.get(songIndex).getAbsolutePathMusic();
 
@@ -783,7 +775,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void updateUIPlayer(int songIndex) {
+    public void updateUIPlayer(int songIndex) {
         //Set Stop para falso
         stop = false;
 
@@ -807,7 +799,7 @@ public class MainActivity extends AppCompatActivity {
         updateProgressBar();
     }
 
-    public static void notifyPlayListAdapter() {
+    public void notifyPlayListAdapter() {
         playListAdapter.setCurrentPlaying(currentSongIndex);
         playListAdapter.setStopped(stop);
         playListAdapter.setPaused(pause);
@@ -846,7 +838,7 @@ public class MainActivity extends AppCompatActivity {
         peekHeigth do BottomSheet, a altura do player é dada em pixels,
         como a altura do botão é em dp, precisa-se converter de dp para px
     */
-    private static void getHeightOfLayoutView(final View v) {
+    private void getHeightOfLayoutView(final View v) {
         ViewTreeObserver viewTreeObserver = v.getViewTreeObserver();
         viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -1036,7 +1028,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static PlayListAdapter getPlayListAdapter() {
-        return playListAdapter;
-    }
 }

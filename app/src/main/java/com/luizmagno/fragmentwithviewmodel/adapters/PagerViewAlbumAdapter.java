@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.fragments.AlbumFragment;
 import com.luizmagno.fragmentwithviewmodel.models.Album;
 
@@ -19,11 +20,14 @@ import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.TITLE_ALBUM;
 
 public class PagerViewAlbumAdapter extends FragmentStatePagerAdapter {
 
-    private ArrayList<Album> listAlbuns;
+    private final ArrayList<Album> listAlbuns;
+    private final MainActivity mainActivity;
 
-    public PagerViewAlbumAdapter(@NonNull FragmentManager fm, ArrayList<Album> list) {
+    @SuppressWarnings("deprecation")
+    public PagerViewAlbumAdapter(@NonNull FragmentManager fm, ArrayList<Album> list, MainActivity mActivity) {
         super(fm);
         this.listAlbuns = list;
+        this.mainActivity = mActivity;
     }
 
     @NonNull
@@ -31,7 +35,7 @@ public class PagerViewAlbumAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
 
         Album album = listAlbuns.get(position);
-        Fragment fragment = AlbumFragment.newInstance();
+        Fragment fragment = AlbumFragment.newInstance(mainActivity);
         Bundle bundle = new Bundle();
 
         bundle.putString(PATH_ALBUM, album.getPathAlbum());

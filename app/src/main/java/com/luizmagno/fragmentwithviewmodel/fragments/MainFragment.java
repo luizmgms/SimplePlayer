@@ -17,9 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.models.Album;
 import com.luizmagno.fragmentwithviewmodel.adapters.AlbumAdapter;
+import com.luizmagno.fragmentwithviewmodel.models.Album;
 import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.io.File;
@@ -35,9 +36,14 @@ public class MainFragment extends Fragment {
 
     LinearLayout layoutBottomSheet;
     BottomSheetBehavior bottomSheetBehavior;
+    MainActivity mainActivity;
 
-    public static MainFragment newInstance() {
-        return new MainFragment();
+    public MainFragment(MainActivity activity) {
+        this.mainActivity = activity;
+    }
+
+    public static MainFragment newInstance(MainActivity activity) {
+        return new MainFragment(activity);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -102,7 +108,7 @@ public class MainFragment extends Fragment {
         //Reclycer
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        AlbumAdapter adapterAlbum = new AlbumAdapter(listAlbuns, getActivity());
+        AlbumAdapter adapterAlbum = new AlbumAdapter(listAlbuns, mainActivity);
         mRecyclerView.setAdapter(adapterAlbum);
         mRecyclerView.setHasFixedSize(true);
 

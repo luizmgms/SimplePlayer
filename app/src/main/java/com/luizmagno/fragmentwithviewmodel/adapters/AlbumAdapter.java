@@ -1,6 +1,5 @@
 package com.luizmagno.fragmentwithviewmodel.adapters;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.fragments.ViewPagerAlbumFragment;
 import com.luizmagno.fragmentwithviewmodel.models.Album;
@@ -23,10 +23,6 @@ import com.luizmagno.fragmentwithviewmodel.models.Music;
 
 import java.util.ArrayList;
 
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.currentSongIndex;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.playList;
-import static com.luizmagno.fragmentwithviewmodel.MainActivity.playSong;
-import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.ALBUM;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.PAGE_VIEW;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.POSITION;
@@ -35,8 +31,8 @@ import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getPathDirecto
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumViewHolder> {
 
-    private ArrayList<Album> listAlbuns;
-    private Activity activity;
+    private final ArrayList<Album> listAlbuns;
+    private final MainActivity activity;
     Toolbar toolbar;
 
 
@@ -57,7 +53,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
         }
     }
 
-    public AlbumAdapter(ArrayList<Album> list, Activity activity) {
+    public AlbumAdapter(ArrayList<Album> list, MainActivity activity) {
         this.listAlbuns = list;
         this.activity = activity;
     }
@@ -92,7 +88,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
             public void onClick(View view) {
 
                 //Fragment fragment = AlbumFragment.newInstance();
-                Fragment fragment = ViewPagerAlbumFragment.newInstance();
+                Fragment fragment = ViewPagerAlbumFragment.newInstance(activity);
                 Bundle bundle = new Bundle();
 
                 String pathAlbums = getPathDirectoryMusicsFromShared(activity);
@@ -127,9 +123,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
             @Override
             public void onClick(View view) {
                 ArrayList<Music> musics =  getListMusics(album.getPathAlbum());
-                currentSongIndex = playList.size();
-                playList.addAll(musics);
-                playSong(currentSongIndex);
+                activity.currentSongIndex = activity.playList.size();
+                activity.playList.addAll(musics);
+                activity.playSong(activity.currentSongIndex);
                 Toast.makeText(activity, R.string.playing, Toast.LENGTH_SHORT).show();
             }
         });
