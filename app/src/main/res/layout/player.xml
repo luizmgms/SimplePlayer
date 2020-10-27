@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layoutPlayerId"
     android:background="@color/colorPrimary"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    tools:showIn="@layout/main_activity">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabNextId"
@@ -47,6 +49,18 @@
         app:layout_constraintEnd_toStartOf="@id/fabPlayId"
         app:layout_constraintTop_toTopOf="@id/fabPlayId" />
 
+    <ImageView
+        android:id="@+id/iconMusicCurrentId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_musical_note_white"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/musical_note"
+        android:layout_marginTop="4dp"
+        android:layout_marginHorizontal="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <TextView
         android:id="@+id/nameMusicIsPlayingId"
         android:layout_width="wrap_content"
@@ -61,9 +75,8 @@
         android:fadingEdgeLength="5dp"
         android:focusable="false"
         android:marqueeRepeatLimit="marquee_forever"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:drawableStartCompat="@drawable/ic_musical_note_white" />
+        app:layout_constraintStart_toEndOf="@id/iconMusicCurrentId"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/currentTimeId"

@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("rawtypes")
     public BottomSheetBehavior bottomSheetBehavior;
     private TextView nameMusicCurrent;
+    private ImageView iconMusicCurrent;
     public ArrayList<Music> playList;
     public PlayListAdapter playListAdapter;
 
@@ -103,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         //LayoutMain
         mCoordinatorLayout = findViewById(R.id.coordinator);
 
-        //Devorations
+        //Decorations
         decorView = getWindow().getDecorView();
 
         //WakeOn
@@ -153,6 +155,9 @@ public class MainActivity extends AppCompatActivity {
         //Nome da música tocando
         nameMusicCurrent = findViewById(R.id.nameMusicIsPlayingId);
         nameMusicCurrent.setSelected(true);
+
+        //Icone da Música tocando
+        iconMusicCurrent = findViewById(R.id.iconMusicCurrentId);
 
         //Times
         timeCurrent = findViewById(R.id.currentTimeId);
@@ -235,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
         videoView = findViewById(R.id.videoViewId);
         /* BUG
         * A primeira vez que vai tocar um vídeo ele lança uma exceção e chama
-        * o onCompletionListener, mas toca o vídeo correspondente.
+        * o onCompletionListener, mas toca o vídeo.
         * Por isso as duas linhas abaixo de código servem para, não corrigir, mas
         * burlar esse BUG. Ele toca uma video de exemplo no onCreate.
         * */
@@ -358,6 +363,28 @@ public class MainActivity extends AppCompatActivity {
                 postDelayedDimensions();
                 //Esconde BottomSheet
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            } else if (fullscreen && !playingVideo) {
+                //está no modo fullscreen, mas não tem video tocando
+                fullscreen = false;
+                //Set Image de botões
+                //botão Fullscreen fica invisivel
+                btnFullscreen.setVisibility(View.INVISIBLE);
+                //botão hideVideo Fica Visivel
+                btnHideShowVideo.setVisibility(View.VISIBLE);
+                //Barra fica visivel
+                barExpColHidBottomSheet.setVisibility(View.VISIBLE);
+                //Orientação vai para retrato
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                //Volta decorations
+                int uiOptions =
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
+                postDelayedDimensions();
+                //Mostra BottomSheet
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
             }
 
@@ -742,6 +769,8 @@ public class MainActivity extends AppCompatActivity {
             layoutVideo.setVisibility(View.VISIBLE);
             btnHideShowVideo.setVisibility(View.VISIBLE);
             btnFullscreen.setVisibility(View.VISIBLE);
+            //Set icone da música a tocar
+            iconMusicCurrent.setImageResource(R.drawable.ic_clipe);
             //Set video in Playback
             videoView.setVideoPath(pathSong);
             videoView.start();
@@ -756,10 +785,17 @@ public class MainActivity extends AppCompatActivity {
             layoutVideo.setVisibility(View.INVISIBLE);
             btnHideShowVideo.setVisibility(View.INVISIBLE);
             btnFullscreen.setVisibility(View.INVISIBLE);
+            //Set icone da música a tocar
+            iconMusicCurrent.setImageResource(R.drawable.ic_musical_note_white);
             //Para videoPlayer
             videoView.stopPlayback();
             //Tocando vídeo is false
             playingVideo = false;
+            //Se estiver no modo fullscreen
+            if (fullscreen) {
+                //...Sair do modo fullscreen
+                fullscreenMode();
+            }
 
             try {
                 mp.reset();
