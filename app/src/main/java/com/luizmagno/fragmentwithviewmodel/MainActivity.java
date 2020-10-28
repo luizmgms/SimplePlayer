@@ -757,6 +757,12 @@ public class MainActivity extends AppCompatActivity {
             layoutVideo.setVisibility(View.VISIBLE);
             btnHideShowVideo.setVisibility(View.VISIBLE);
             btnFullscreen.setVisibility(View.VISIBLE);
+            if (!fullscreen) {
+                btnFullscreen.setImageResource(R.drawable.ic_fullscreen);
+            }
+            if (videoHide) {
+                hideShowVideo();
+            }
             //Set icone da música a tocar
             iconMusicCurrent.setImageResource(R.drawable.ic_clipe);
 
