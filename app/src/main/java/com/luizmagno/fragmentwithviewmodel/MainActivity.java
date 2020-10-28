@@ -21,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,8 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
     public MediaPlayer mp = new MediaPlayer();
 
-    private Activity activity;
-
     public VideoView videoView;
     public boolean playingVideo = false;
     private ConstraintLayout layoutVideo;
@@ -96,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-
-        activity = this;
 
         //video Example
         String uriRawVideoExample = "android.resource://" + getPackageName() + "/" + R.raw.example;
@@ -145,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetBehavior.addBottomSheetCallback(callbackSheetBehavior());
 
         //Layout do Player
-        final ConstraintLayout layoutPlayer = findViewById(R.id.layoutPlayerId);
+        ConstraintLayout layoutPlayer = findViewById(R.id.layoutPlayerId);
 
         //Pega altura do Player
         getHeightOfLayoutView(layoutPlayer);
@@ -182,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 currentSongIndex = i;
                 playSong(i);
-                notifyPlayListAdapter();
             }
         });
 
@@ -194,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playPlayList(activity);
+                playPlayList();
             }
         });
 
@@ -238,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
         //VideoView
         videoView = findViewById(R.id.videoViewId);
-        /* BUG
+        /* BUG:
         * A primeira vez que vai tocar um vídeo ele lança uma exceção e chama
         * o onCompletionListener, mas toca o vídeo.
         * Por isso as duas linhas abaixo de código servem para, não corrigir, mas
@@ -258,28 +252,7 @@ public class MainActivity extends AppCompatActivity {
         btnHideShowVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (videoHide) {
-                    //Se o video está escondido...
-                    //Aumenta sua elevação para mostrar
-                    ViewCompat.setElevation(layoutVideo, 8);
-                    //Muda imagem do botão para video off
-                    btnHideShowVideo.setImageResource(R.drawable.ic_video_off);
-                    //Botão fullscreen fica visivel
-                    btnFullscreen.setVisibility(View.VISIBLE);
-                    //set videoHide para false
-                    videoHide = false;
-                } else {
-                    //Video não está escondido...
-                    //Baixa sua elevação para esconder
-                    ViewCompat.setElevation(layoutVideo, -8);
-                    //Muda imagem do botão para video on
-                    btnHideShowVideo.setImageResource(R.drawable.ic_video_on);
-                    //Botão fullscreen fica invisivel
-                    btnFullscreen.setVisibility(View.INVISIBLE);
-                    //set videoHide para true
-                    videoHide = true;
-                }
-                
+                hideShowVideo();
             }
         });
 
@@ -295,9 +268,40 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /****************
+    *
+    *   MEUS METÓDOS
+    *
+    * ***************/
+
+    private void hideShowVideo() {
+        if (videoHide) {
+            //Se o video está escondido...
+            //Aumenta sua elevação para mostrar
+            ViewCompat.setElevation(layoutVideo, 8);
+            //Muda imagem do botão para video off
+            btnHideShowVideo.setImageResource(R.drawable.ic_video_off);
+            //Botão fullscreen fica visivel
+            btnFullscreen.setVisibility(View.VISIBLE);
+            //set videoHide para false
+            videoHide = false;
+        } else {
+            //Video não está escondido...
+            //Baixa sua elevação para esconder
+            ViewCompat.setElevation(layoutVideo, -8);
+            //Muda imagem do botão para video on
+            btnHideShowVideo.setImageResource(R.drawable.ic_video_on);
+            //Botão fullscreen fica invisivel
+            btnFullscreen.setVisibility(View.INVISIBLE);
+            //set videoHide para true
+            videoHide = true;
+        }
+    }
+
     private int getStatusBarHeight() {
         int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = getResources().getIdentifier(
+                "status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             result = getResources().getDimensionPixelSize(resourceId);
         }
@@ -306,7 +310,8 @@ public class MainActivity extends AppCompatActivity {
 
     private int getNavBarHeight() {
         int result = 0;
-        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        int resourceId = getResources().getIdentifier(
+                "navigation_bar_height", "dimen", "android");
         if (resourceId > 0) {
             result = getResources().getDimensionPixelSize(resourceId);
         }
@@ -370,8 +375,8 @@ public class MainActivity extends AppCompatActivity {
                 //Set Image de botões
                 //botão Fullscreen fica invisivel
                 btnFullscreen.setVisibility(View.INVISIBLE);
-                //botão hideVideo Fica Visivel
-                btnHideShowVideo.setVisibility(View.VISIBLE);
+                //botão hideVideo Fica invisivel
+                btnHideShowVideo.setVisibility(View.INVISIBLE);
                 //Barra fica visivel
                 barExpColHidBottomSheet.setVisibility(View.VISIBLE);
                 //Orientação vai para retrato
@@ -449,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
                         pause = false;
                         currentSongIndex++;
                         notifyPlayListAdapter();
-                        playPlayList(activity);
+                        playPlayList();
                     }
 
                 } else {
@@ -477,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
                         pause = false;
                         currentSongIndex++;
                         notifyPlayListAdapter();
-                        playPlayList(activity);
+                        playPlayList();
                     }
 
                 } else {
@@ -558,7 +563,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void nextMusic() {
         if (playList.isEmpty()) {
-            //Se a playList tá vazia
+            //Se a playList está vazia
             if (mp.isPlaying() || playingVideo || pause) {
                 //...Mas tá tocando ou está em pausa
                 Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
@@ -669,27 +674,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        int id = item.getItemId();
-
-        if (id == R.id.choose_dir) {
-            chooseDirectory();
-        } else if (id == R.id.show_playlist) {
-            showPlayList();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void playPlayList(Activity activity) {
+    public void playPlayList() {
 
         if (playList.isEmpty()) {
             //Lista Vazia...
@@ -701,7 +686,7 @@ public class MainActivity extends AppCompatActivity {
                 playPauseSong();
             } else {
                 //...Não está tocando nem está em pausa
-                Toast.makeText(activity, R.string.list_empty, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.list_empty, Toast.LENGTH_SHORT).show();
             }
 
         } else if(stop) {
@@ -871,8 +856,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*Esta função serve para pegar a altura do player que é dinâmica e setar a altura do
-        peekHeigth do BottomSheet, a altura do player é dada em pixels,
-        como a altura do botão é em dp, precisa-se converter de dp para px
+        peekHeigth do BottomSheet, a altura do player é dada em pixels.
     */
     private void getHeightOfLayoutView(final View v) {
         ViewTreeObserver viewTreeObserver = v.getViewTreeObserver();
@@ -967,7 +951,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void chooseDirectory() {
+    private void chooseDirectory(final Activity activity) {
 
         final StorageChooser chooser = new StorageChooser.Builder()
                 // Specify context of the dialog
@@ -995,6 +979,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void setStoppedAtribsUI () {
+        mp.stop();
+        stop = true;
+        pause = false;
+        currentSongIndex = 0;
+        nameMusicCurrent.setText("");
+        buttonPlay.setImageResource(R.drawable.ic_play);
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        progressBar.setProgress(0);
+        timeCurrent.setText(R.string.time);
+        timeTotal.setText(R.string.time);
+        notifyPlayListAdapter();
+    }
+
+    /***********
+    *
+    *   OVERRRIDES
+    *
+    * ***********/
 
     @Override
     public void onBackPressed() {
@@ -1012,10 +1015,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mp.isPlaying()) {
+        if (mp.isPlaying() || videoView.isPlaying()) {
             mp.pause();
-        }
-        if (videoView.isPlaying()) {
             videoView.pause();
         }
     }
@@ -1023,27 +1024,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mp != null) {
+        if (mp != null || videoView !=null) {
             mp.release();
-        }
-        if (videoView != null) {
             videoView.stopPlayback();
         }
         mHandler.removeCallbacks(mUpdateTimeTask);
     }
 
-    private void setStoppedAtribsUI () {
-        mp.stop();
-        stop = true;
-        pause = false;
-        currentSongIndex = 0;
-        nameMusicCurrent.setText("");
-        buttonPlay.setImageResource(R.drawable.ic_play);
-        mHandler.removeCallbacks(mUpdateTimeTask);
-        progressBar.setProgress(0);
-        timeCurrent.setText(R.string.time);
-        timeTotal.setText(R.string.time);
-        notifyPlayListAdapter();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.choose_dir) {
+            chooseDirectory(this);
+        } else if (id == R.id.show_playlist) {
+            showPlayList();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

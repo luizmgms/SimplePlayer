@@ -35,6 +35,7 @@ import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.startMain;
 public class MainFragment extends Fragment {
 
     LinearLayout layoutBottomSheet;
+    @SuppressWarnings("rawtypes")
     BottomSheetBehavior bottomSheetBehavior;
     MainActivity mainActivity;
 
