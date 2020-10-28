@@ -27,9 +27,6 @@ public class Utilities {
     public final static String TITLE_ALBUM = "titleAlbum";
     public final static String CAPA_ALBUM = "capaAlbum";
     public final static String QNT_MUSICS = "qntMusics";
-    public final static String ALBUM = "album";
-    public final static String VIDEO = "video";
-    public final static String PATH_VIDEO = "pathVideo";
     public final static String PAGE_VIEW = "pageView";
 
     public final static int PERMISSION_REQUEST_READ_CARD = 0;

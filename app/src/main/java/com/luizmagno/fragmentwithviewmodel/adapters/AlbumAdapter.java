@@ -96,11 +96,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
                 bundle.putString(DIRECTORY_MUSICS, pathAlbums);
                 bundle.putInt(POSITION, position);
 
-                /*bundle.putString("pathAlbum", album.getPathAlbum());
-                bundle.putString("titleAlbum", album.getNameAlbum());
-                bundle.putString("capaAlbum", album.getPathCapaAlbum());
-                bundle.putInt("qntMusics", album.getNumOfMusics());*/
-
                 //Set Arguments
                 fragment.setArguments(bundle);
 

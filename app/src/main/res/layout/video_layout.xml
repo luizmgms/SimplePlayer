@@ -22,21 +22,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <ImageView
-        android:id="@+id/btnPlayInVideoViewId"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:contentDescription="@string/play_pause"
-        android:src="@drawable/ic_pause"
-        android:visibility="invisible"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?android:attr/selectableItemBackground"
-        app:layout_constraintEnd_toEndOf="@id/videoViewId"
-        app:layout_constraintStart_toStartOf="@id/videoViewId"
-        app:layout_constraintTop_toTopOf="@id/videoViewId"
-        app:layout_constraintBottom_toBottomOf="@id/videoViewId"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

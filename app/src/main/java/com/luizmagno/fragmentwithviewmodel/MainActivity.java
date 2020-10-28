@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public int currentSongIndex = 0;
     private ProgressBar progressBar;
     private final Handler mHandler = new Handler();
+    private final Handler hadleHideBottomSheet = new Handler();
     private final Utilities utils = new Utilities();
     private TextView timeCurrent;
     private TextView timeTotal;
@@ -80,13 +81,13 @@ public class MainActivity extends AppCompatActivity {
     private AppBarLayout appBarLayout;
     private boolean videoHide = false;
     private ImageView btnHideShowVideo;
-    private boolean fullscreen = false;
+    public boolean fullscreen = false;
     private ImageView btnFullscreen;
     private CoordinatorLayout mCoordinatorLayout;
     private View barExpColHidBottomSheet;
-    private ImageView btnPlayInVideoView;
+    private int currentPositionVideo = 0;
 
-    private View decorView;
+    public View decorView;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -227,11 +228,10 @@ public class MainActivity extends AppCompatActivity {
         //LayoutVideo
         layoutVideo = findViewById(R.id.layoutVideoId);
         layoutVideo.setOnTouchListener(onTouchVideoListener());
-        //Botão Play in Video
-        btnPlayInVideoView = findViewById(R.id.btnPlayInVideoViewId);
 
         //VideoView
         videoView = findViewById(R.id.videoViewId);
+
         /* BUG:
         * A primeira vez que vai tocar um vídeo ele lança uma exceção e chama
         * o onCompletionListener, mas toca o vídeo.
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    private void fullscreenMode() {
+    public void fullscreenMode() {
 
             if (fullscreen && playingVideo) {
                 //Está em tela cheia e tocando Video
@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
                 //Esconde BottomSheet
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-            } else if (fullscreen && !playingVideo) {
+            } else if (fullscreen) {
                 //está no modo fullscreen, mas não tem video tocando
                 fullscreen = false;
                 //Set Image de botões
@@ -613,6 +613,13 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    private final Runnable runHideBottomSheet = new Runnable() {
+        @Override
+        public void run() {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
+    };
+
     private View.OnTouchListener onTouchVideoListener() {
         return (new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -625,26 +632,24 @@ public class MainActivity extends AppCompatActivity {
                     if (action == MotionEvent.ACTION_DOWN) {
                         // Disallow NestedScrollView to intercept touch events.
                         view.getParent().requestDisallowInterceptTouchEvent(true);
+
                     } else if (action == MotionEvent.ACTION_UP) {
 
+                        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+                            //BottomSheet está escondida...
+                            //Remove callbacks
+                            hadleHideBottomSheet.removeCallbacks(runHideBottomSheet);
+                            //Mostra BottomSheet
+                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            //Hide BottomSheet após 3s
+                            hadleHideBottomSheet.postDelayed(runHideBottomSheet, 3000);
 
-                        //Mostrar botão
-                        btnPlayInVideoView.setVisibility(View.VISIBLE);
-                        btnPlayInVideoView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                playPauseSong();
-                            }
-                        });
-
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                btnPlayInVideoView.setVisibility(View.INVISIBLE);
-                            }
-                        }, 5000);
-
+                        } else if (bottomSheetBehavior.getState()
+                                == BottomSheetBehavior.STATE_COLLAPSED) {
+                            //BottomSheet está presente...
+                            //Hide BottomSheet
+                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        }
 
                     }
 
@@ -708,13 +713,11 @@ public class MainActivity extends AppCompatActivity {
                 videoView.pause();
                 // Changing button image to play button
                 buttonPlay.setImageResource(R.drawable.ic_play);
-                btnPlayInVideoView.setImageResource(R.drawable.ic_play);
                 pause = true;
             } else {
                 videoView.start();
                 // Changing button image to pause button
                 buttonPlay.setImageResource(R.drawable.ic_pause);
-                btnPlayInVideoView.setImageResource(R.drawable.ic_pause);
                 pause = false;
             }
             notifyPlayListAdapter();
@@ -756,6 +759,20 @@ public class MainActivity extends AppCompatActivity {
             btnFullscreen.setVisibility(View.VISIBLE);
             //Set icone da música a tocar
             iconMusicCurrent.setImageResource(R.drawable.ic_clipe);
+
+            //Set onPrepare
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    if (currentPositionVideo > 0) {
+                        videoView.seekTo(currentPositionVideo);
+                    } else {
+                        // Skipping to 1 shows the first frame of the video.
+                        videoView.seekTo(1);
+                    }
+                }
+            });
+
             //Set video in Playback
             videoView.setVideoPath(pathSong);
             videoView.start();
@@ -1006,29 +1023,45 @@ public class MainActivity extends AppCompatActivity {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else if (fullscreen) {
             fullscreenMode();
-        }else {
+        } else {
             toolbar.setTitle(R.string.app_name);
             super.onBackPressed();
         }
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (playingVideo) {
+            if (!pause && !stop) {
+                videoView.start();
+            }
+        }
+
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
-        if (mp.isPlaying() || videoView.isPlaying()) {
-            mp.pause();
+        if (playingVideo && !pause) {
             videoView.pause();
+            currentPositionVideo = videoView.getCurrentPosition();
+        } else {
+            currentPositionVideo = videoView.getCurrentPosition();
         }
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mp != null || videoView !=null) {
+            assert mp != null;
             mp.release();
             videoView.stopPlayback();
         }
         mHandler.removeCallbacks(mUpdateTimeTask);
+        hadleHideBottomSheet.removeCallbacks(runHideBottomSheet);
     }
 
     @Override
@@ -1063,6 +1096,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 //Retrato
                 appBarLayout.setExpanded(true, true);
+                hadleHideBottomSheet.removeCallbacks(runHideBottomSheet);
             }
 
         }
