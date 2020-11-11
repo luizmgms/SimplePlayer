@@ -81,14 +81,14 @@ public class Utilities {
      * Function to change progress to timer
      * returns current duration in milliseconds
      * */
-    /*public int progressToTimer(int progress, int totalDuration) {
-        int currentDuration = 0;
+    public int progressToTimer(int progress, int totalDuration) {
+        int currentDuration;
         totalDuration = (int) (totalDuration / 1000);
         currentDuration = (int) ((((double)progress) / 100) * totalDuration);
 
         // return current duration in milliseconds
         return currentDuration * 1000;
-    }*/
+    }
 
     public Album getAlbum(File dirAlbum) {
 
@@ -208,7 +208,7 @@ public class Utilities {
         activity.finish();
     }
 
-    public static ArrayList<Album> getListAlbuns(String path) {
+   /* public static ArrayList<Album> getListAlbuns(String path) {
 
         ArrayList<Album> list = new ArrayList<>();
 
@@ -223,7 +223,7 @@ public class Utilities {
         }
 
         return list;
-    }
+    }*/
 
     public static ArrayList<Music> getListMusics(String path) {
 

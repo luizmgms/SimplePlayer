@@ -21,13 +21,14 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -64,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean stop = true;
     public boolean pause = false;
     public int currentSongIndex = 0;
-    private ProgressBar progressBar;
+    //private ProgressBar progressBar;
+    AppCompatSeekBar progressBar;
     private final Handler mHandler = new Handler();
     private final Handler handleHideBottomSheet = new Handler();
     private final Utilities utils = new Utilities();
@@ -133,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Layout do BottomShet
         layoutBottomSheet = findViewById(R.id.layout_bottom_sheet);
-        //layoutBottomSheet.setOnTouchListener(onTouchListener());
 
         //Comportamento do BottomSheet
         bottomSheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
@@ -161,6 +162,56 @@ public class MainActivity extends AppCompatActivity {
 
         //ProgressBar
         progressBar = findViewById(R.id.progressBar);
+        progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (!stop) {
+                    mHandler.removeCallbacks(mUpdateTimeTask);
+                    if (playingVideo) {
+                        long total = utils.progressToTimer(progress, videoView.getDuration());
+                        String strTime = utils.milliSecondsToTimer(total);
+                        timeCurrent.setText(strTime);
+                    } else {
+                        long total = utils.progressToTimer(progress, mp.getDuration());
+                        String strTime = utils.milliSecondsToTimer(total);
+                        timeCurrent.setText(strTime);
+                    }
+                } else {
+                    seekBar.setProgress(0);
+                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mHandler.removeCallbacks(mUpdateTimeTask);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (!stop) {
+                    mHandler.removeCallbacks(mUpdateTimeTask);
+                    int totalDuration;
+                    if (playingVideo) {
+                        totalDuration = videoView.getDuration();
+                    } else {
+                        totalDuration = mp.getDuration();
+                    }
+
+                    int position = utils.progressToTimer(seekBar.getProgress(), totalDuration);
+
+                    // forward or backward to certain seconds
+                    if (playingVideo) {
+                        videoView.seekTo(position);
+                    } else {
+                        mp.seekTo(position);
+                    }
+
+                    // update timer progress again
+                    updateProgressBar();
+                }
+            }
+        });
 
         //PlayList
         final ListView playListView = findViewById(R.id.playListId);
