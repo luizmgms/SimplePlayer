@@ -16,11 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
-import com.luizmagno.fragmentwithviewmodel.utils.AsyncGetDurations;
-import com.luizmagno.fragmentwithviewmodel.models.Music;
 import com.luizmagno.fragmentwithviewmodel.adapters.MusicAdapter;
+import com.luizmagno.fragmentwithviewmodel.models.Music;
+import com.luizmagno.fragmentwithviewmodel.utils.AsyncGetDurations;
+import com.luizmagno.fragmentwithviewmodel.utils.MusicComparator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.CAPA_ALBUM;
@@ -95,6 +97,10 @@ public class AlbumFragment extends Fragment {
 
         //Lista das Músicas
         listMusics = getListMusics(pathAlbum);
+
+        //Ordenando..
+        MusicComparator comp = new MusicComparator();
+        Collections.sort(listMusics, comp);
 
         //Layout do ReclycerView
         listViewMusics.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public int currentSongIndex = 0;
     private ProgressBar progressBar;
     private final Handler mHandler = new Handler();
-    private final Handler hadleHideBottomSheet = new Handler();
+    private final Handler handleHideBottomSheet = new Handler();
     private final Utilities utils = new Utilities();
     private TextView timeCurrent;
     private TextView timeTotal;
@@ -446,6 +446,9 @@ public class MainActivity extends AppCompatActivity {
                     //Se a PlayList não estiver vazia
                     if (currentSongIndex == playList.size() - 1) {
                         //Música que está tocando é a última da lista, então parar de tocar
+                        if(fullscreen) {
+                            fullscreenMode();
+                        }
                         setStoppedAtribsUI();
                     } else {
                         //Não é a última então toque a próxima música
@@ -459,6 +462,9 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     //Lista está vazia
+                    if (fullscreen){
+                        fullscreenMode();
+                    }
                     setStoppedAtribsUI();
                 }
             }
@@ -638,11 +644,11 @@ public class MainActivity extends AppCompatActivity {
                         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
                             //BottomSheet está escondida...
                             //Remove callbacks
-                            hadleHideBottomSheet.removeCallbacks(runHideBottomSheet);
+                            handleHideBottomSheet.removeCallbacks(runHideBottomSheet);
                             //Mostra BottomSheet
                             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                             //Hide BottomSheet após 3s
-                            hadleHideBottomSheet.postDelayed(runHideBottomSheet, 3000);
+                            handleHideBottomSheet.postDelayed(runHideBottomSheet, 3000);
 
                         } else if (bottomSheetBehavior.getState()
                                 == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -1007,6 +1013,7 @@ public class MainActivity extends AppCompatActivity {
         stop = true;
         pause = false;
         currentSongIndex = 0;
+        iconMusicCurrent.setImageResource(R.drawable.ic_musical_note_white);
         nameMusicCurrent.setText("");
         buttonPlay.setImageResource(R.drawable.ic_play);
         mHandler.removeCallbacks(mUpdateTimeTask);
@@ -1051,11 +1058,8 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         if (playingVideo && !pause) {
             videoView.pause();
-            currentPositionVideo = videoView.getCurrentPosition();
-        } else {
-            currentPositionVideo = videoView.getCurrentPosition();
         }
-
+        currentPositionVideo = videoView.getCurrentPosition();
     }
 
     @Override
@@ -1067,7 +1071,7 @@ public class MainActivity extends AppCompatActivity {
             videoView.stopPlayback();
         }
         mHandler.removeCallbacks(mUpdateTimeTask);
-        hadleHideBottomSheet.removeCallbacks(runHideBottomSheet);
+        handleHideBottomSheet.removeCallbacks(runHideBottomSheet);
     }
 
     @Override
@@ -1102,7 +1106,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 //Retrato
                 appBarLayout.setExpanded(true, true);
-                hadleHideBottomSheet.removeCallbacks(runHideBottomSheet);
+                handleHideBottomSheet.removeCallbacks(runHideBottomSheet);
             }
 
         }

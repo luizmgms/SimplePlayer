@@ -23,11 +23,9 @@ import com.luizmagno.fragmentwithviewmodel.models.Music;
 
 import java.util.ArrayList;
 
-import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.PAGE_VIEW;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.POSITION;
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getListMusics;
-import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.getPathDirectoryMusicsFromShared;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumViewHolder> {
 
@@ -88,12 +86,8 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ItemAlbumVie
             public void onClick(View view) {
 
                 //Fragment fragment = AlbumFragment.newInstance();
-                Fragment fragment = ViewPagerAlbumFragment.newInstance(activity);
+                Fragment fragment = ViewPagerAlbumFragment.newInstance(activity, listAlbuns);
                 Bundle bundle = new Bundle();
-
-                String pathAlbums = getPathDirectoryMusicsFromShared(activity);
-
-                bundle.putString(DIRECTORY_MUSICS, pathAlbums);
                 bundle.putInt(POSITION, position);
 
                 //Set Arguments

@@ -21,10 +21,12 @@ import com.luizmagno.fragmentwithviewmodel.MainActivity;
 import com.luizmagno.fragmentwithviewmodel.R;
 import com.luizmagno.fragmentwithviewmodel.adapters.AlbumAdapter;
 import com.luizmagno.fragmentwithviewmodel.models.Album;
+import com.luizmagno.fragmentwithviewmodel.utils.AlbumComparator;
 import com.luizmagno.fragmentwithviewmodel.utils.Utilities;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 import static com.luizmagno.fragmentwithviewmodel.utils.Utilities.DIRECTORY_MUSICS;
@@ -85,6 +87,10 @@ public class MainFragment extends Fragment {
         } else {
             chooseDirectory();
         }
+
+        //Ordenando...
+        AlbumComparator comp = new AlbumComparator();
+        Collections.sort(listAlbuns, comp);
 
 
         /*//Quando Scrolling
